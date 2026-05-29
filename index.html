@@ -389,6 +389,95 @@
   }
   .no-match p { font-size: 14px; color: var(--text-mid); line-height: 1.7; }
 
+  /* ── Download buttons ── */
+  .download-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+  .dl-btn {
+    flex: 1;
+    min-width: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    border: none;
+  }
+  .dl-btn-pdf {
+    background: var(--navy);
+    color: #fff;
+  }
+  .dl-btn-pdf:hover { opacity: 0.88; }
+  .dl-btn-copy {
+    background: var(--sand);
+    color: var(--navy);
+    border: 0.5px solid var(--border-strong);
+  }
+  .dl-btn-copy:hover { background: var(--light-gold); }
+  .dl-btn svg { flex-shrink: 0; }
+  .copy-confirm {
+    font-size: 12px;
+    color: var(--success);
+    text-align: center;
+    margin-top: 8px;
+    height: 18px;
+    transition: opacity 0.3s;
+  }
+
+  /* ── Print styles (PDF) ── */
+  @media print {
+    header, .tagline-strip, main > .form-card,
+    main > .grid-2, main > .generate-btn,
+    .result-header, .chips, .nutrition-panel,
+    .divider, .section-label, .ingredients-list,
+    .steps-list, .info-box, .actions,
+    .download-row, .copy-confirm, footer,
+    .grocery-top .grocery-hint { display: none !important; }
+    body { background: #fff; font-family: 'DM Sans', sans-serif; }
+    main { padding: 0; max-width: 100%; }
+    #result { display: block !important; margin: 0; }
+    .grocery-card {
+      border: none !important;
+      margin: 0 !important;
+      box-shadow: none;
+    }
+    .grocery-top {
+      background: #2C2C3E !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      padding: 1rem !important;
+    }
+    .grocery-top-title { font-size: 18px !important; }
+    .grocery-body { padding: 1rem !important; }
+    .grocery-item { padding: 6px 0 !important; }
+    .grocery-item input { display: none; }
+    .grocery-item label::before {
+      content: '☐ ';
+      font-size: 14px;
+    }
+    .grocery-item label.done::before { content: '☑ '; }
+    .grocery-footer { background: #F5EDE3 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .have-badge { display: none; }
+    .print-meal-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: #2C2C3E;
+      padding: 0.75rem 1.5rem;
+      background: #F5EDE3;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
+
   /* ── Footer ── */
   footer {
     text-align: center;
@@ -1012,6 +1101,17 @@ function renderResult(meal) {
         '<p class="progress-label" id="progress">0 of ' + needIds.length + ' items checked</p>' +
         '<button class="clear-btn" onclick="clearList()">Clear all</button>' +
       '</div>' +
+      '<div class="download-row" style="padding:0 1.5rem 1rem;background:#fff;">' +
+        '<button class="dl-btn dl-btn-pdf" onclick="downloadPDF()">' +
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
+          ' Save as PDF' +
+        '</button>' +
+        '<button class="dl-btn dl-btn-copy" onclick="copyList()">' +
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
+          ' Copy to clipboard' +
+        '</button>' +
+      '</div>' +
+      '<p class="copy-confirm" id="copy-confirm" style="padding:0 1.5rem 0.75rem;background:#fff;"></p>' +
     '</div>' +
     '<div class="actions">' +
       '<button class="action-btn" onclick="document.getElementById(\'ingredients\').value=\'\'; document.getElementById(\'result\').classList.remove(\'show\'); document.getElementById(\'ingredients\').focus();">New ingredients</button>' +
@@ -1050,3 +1150,45 @@ function clearList() {
 </script>
 </body>
 </html>
+<script>
+function downloadPDF() { window.print(); }
+
+function copyList() {
+  var sections = document.querySelectorAll('.grocery-section');
+  if (!sections.length) return;
+  var text = '🛒 GROCERY LIST — The Thriving Woman Reset\n';
+  text += 'thethrivingwomanreset.com/meal-generator\n';
+  text += '─────────────────────────────────────────\n';
+  sections.forEach(function(sec) {
+    var title = sec.querySelector('.grocery-section-name');
+    if (title) text += '\n' + title.textContent.toUpperCase() + '\n';
+    sec.querySelectorAll('.grocery-item').forEach(function(item) {
+      var lbl = item.querySelector('label');
+      var badge = item.querySelector('.have-badge');
+      if (lbl) text += (badge ? '  ✓ ' : '  ☐ ') + lbl.textContent.trim() + (badge ? ' (have this)' : '') + '\n';
+    });
+  });
+  text += '\n─────────────────────────────────────────\n';
+  text += 'Generated by TWR Fridge-to-Meal Generator\n';
+
+  function showConfirm(msg) {
+    var el = document.getElementById('copy-confirm');
+    if (el) { el.textContent = msg; el.style.opacity = '1'; setTimeout(function(){ el.style.opacity = '0'; }, 4000); }
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function() {
+      showConfirm('✓ Grocery list copied! Paste it in Notes, Instacart, or iMessage.');
+    }).catch(function() { fallback(text, showConfirm); });
+  } else { fallback(text, showConfirm); }
+}
+
+function fallback(text, cb) {
+  var ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); cb('✓ Copied! Paste it anywhere you shop.'); }
+  catch(e) { cb('Select the list manually to copy.'); }
+  document.body.removeChild(ta);
+}
+</script>

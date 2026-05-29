@@ -1,0 +1,1817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fridge-to-Meal Generator | The Thriving Woman Reset</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #2C2C3E;
+    --gold: #B8976A;
+    --sand: #F5EDE3;
+    --warm-white: #FAFAF8;
+    --light-gold: #D4B896;
+    --text-dark: #1a1a2e;
+    --text-mid: #6b6b7b;
+    --text-light: #9a9aaa;
+    --border: rgba(184,151,106,0.2);
+    --border-strong: rgba(184,151,106,0.4);
+    --success: #4a7c59;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--warm-white);
+    color: var(--text-dark);
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--navy);
+    padding: 2rem 1.5rem 1.5rem;
+    text-align: center;
+  }
+  .brand-eyebrow {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--light-gold);
+    text-transform: uppercase;
+    font-weight: 400;
+    margin-bottom: 6px;
+  }
+  .brand-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 6vw, 40px);
+    font-weight: 400;
+    color: var(--warm-white);
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+  .brand-title em { color: var(--gold); font-style: italic; }
+  .brand-sub {
+    font-size: 13px;
+    color: var(--light-gold);
+    font-weight: 300;
+    letter-spacing: 0.5px;
+  }
+  .tagline-strip {
+    background: var(--gold);
+    padding: 8px;
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--navy);
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  /* ── Main layout ── */
+  main { max-width: 680px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+  /* ── Form cards ── */
+  .form-card {
+    background: #fff;
+    border: 0.5px solid var(--border-strong);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .form-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    display: block;
+    margin-bottom: 10px;
+  }
+  .ingredient-input {
+    width: 100%;
+    border: 0.5px solid var(--border-strong);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-dark);
+    background: var(--warm-white);
+    resize: none;
+    min-height: 90px;
+    line-height: 1.6;
+    transition: border-color 0.2s;
+  }
+  .ingredient-input:focus { outline: none; border-color: var(--gold); }
+  .ingredient-input::placeholder { color: var(--text-light); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media(max-width: 520px){ .grid-2 { grid-template-columns: 1fr; } }
+  .pill-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill {
+    border: 0.5px solid var(--border-strong);
+    border-radius: 20px;
+    padding: 7px 15px;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--text-mid);
+    background: #fff;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    line-height: 1;
+  }
+  .pill:hover { border-color: var(--gold); color: var(--gold); }
+  .pill.on { background: var(--navy); border-color: var(--navy); color: #fff; }
+  .new-tag {
+    font-size: 9px;
+    background: var(--gold);
+    color: #fff;
+    border-radius: 6px;
+    padding: 2px 6px;
+    margin-left: 5px;
+    vertical-align: middle;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Generate button ── */
+  .generate-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0.5px;
+    transition: opacity 0.2s, transform 0.1s;
+    margin-top: 0.5rem;
+  }
+  .generate-btn:hover { opacity: 0.9; }
+  .generate-btn:active { transform: scale(0.99); }
+
+  /* ── Result section ── */
+  #result { display: none; margin-top: 2.5rem; }
+  #result.show { display: block; }
+  .result-header {
+    border-left: 3px solid var(--gold);
+    padding-left: 16px;
+    margin-bottom: 1.25rem;
+  }
+  .result-eyebrow {
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    color: var(--gold);
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 5px;
+  }
+  .result-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(22px, 5vw, 30px);
+    font-weight: 500;
+    color: var(--navy);
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+  .result-vibe {
+    font-size: 14px;
+    color: var(--text-mid);
+    font-style: italic;
+    line-height: 1.6;
+  }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 1rem 0; }
+  .chip {
+    font-size: 12px;
+    color: var(--gold);
+    background: var(--sand);
+    padding: 5px 13px;
+    border-radius: 20px;
+    font-weight: 400;
+  }
+
+  /* ── Nutrition panel ── */
+  .nutrition-panel {
+    background: var(--navy);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+  .nutrition-panel-title {
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    color: var(--light-gold);
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 1.25rem;
+  }
+  .nutrition-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  .nutrition-item { text-align: center; }
+  .nutrition-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 500;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .nutrition-label {
+    font-size: 10px;
+    color: var(--light-gold);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .nutrition-rule {
+    border: none;
+    border-top: 0.5px solid rgba(212,184,150,0.2);
+    margin: 1.25rem 0;
+  }
+  .nutrition-note {
+    font-size: 10px;
+    color: var(--light-gold);
+    opacity: 0.6;
+    text-align: center;
+    margin-top: 0.75rem;
+  }
+
+  /* ── Sections ── */
+  .divider { border: none; border-top: 0.5px solid var(--border); margin: 1.5rem 0; }
+  .section-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    display: block;
+    margin-bottom: 12px;
+  }
+  .steps-list, .ingredients-list { padding-left: 1.25rem; }
+  .steps-list li, .ingredients-list li {
+    font-size: 14px;
+    color: var(--text-dark);
+    line-height: 1.7;
+    margin-bottom: 6px;
+  }
+  .info-box {
+    background: var(--sand);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .info-box p { font-size: 13px; color: var(--text-dark); line-height: 1.7; }
+  .info-box .section-label { margin-bottom: 5px; }
+
+  /* ── Grocery list ── */
+  .grocery-card {
+    border: 1px solid var(--border-strong);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-top: 2rem;
+  }
+  .grocery-top {
+    background: var(--navy);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .grocery-top-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 500;
+    color: #fff;
+  }
+  .grocery-top-sub { font-size: 12px; color: var(--light-gold); margin-top: 2px; }
+  .grocery-hint { font-size: 11px; color: var(--light-gold); opacity: 0.8; }
+  .grocery-body { padding: 1.25rem 1.5rem; background: #fff; }
+  .grocery-section { margin-bottom: 1.25rem; }
+  .grocery-section-name {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding-bottom: 6px;
+    border-bottom: 0.5px solid var(--border);
+    margin-bottom: 10px;
+  }
+  .grocery-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    cursor: pointer;
+    border-bottom: 0.5px solid rgba(184,151,106,0.08);
+  }
+  .grocery-item:last-child { border-bottom: none; }
+  .grocery-item input[type="checkbox"] {
+    accent-color: var(--navy);
+    width: 17px;
+    height: 17px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .grocery-item label {
+    font-size: 14px;
+    color: var(--text-dark);
+    cursor: pointer;
+    flex: 1;
+    line-height: 1.4;
+  }
+  .grocery-item label.done {
+    text-decoration: line-through;
+    color: var(--text-light);
+  }
+  .have-badge {
+    font-size: 10px;
+    color: var(--success);
+    background: #edf7f0;
+    padding: 2px 8px;
+    border-radius: 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    letter-spacing: 0.3px;
+  }
+  .grocery-footer {
+    border-top: 0.5px solid var(--border);
+    padding: 12px 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--sand);
+  }
+  .progress-label { font-size: 12px; color: var(--text-mid); }
+  .clear-btn {
+    font-size: 12px;
+    color: var(--gold);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+  }
+  .clear-btn:hover { text-decoration: underline; }
+
+  /* ── Action buttons ── */
+  .actions { display: flex; gap: 10px; margin-top: 1.5rem; flex-wrap: wrap; }
+  .action-btn {
+    flex: 1;
+    min-width: 140px;
+    padding: 12px;
+    border: 0.5px solid var(--gold);
+    border-radius: 10px;
+    background: none;
+    color: var(--gold);
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    text-align: center;
+    transition: background 0.15s;
+  }
+  .action-btn:hover { background: var(--sand); }
+  .action-btn.primary {
+    background: var(--navy);
+    color: #fff;
+    border-color: var(--navy);
+  }
+  .action-btn.primary:hover { opacity: 0.88; }
+
+  /* ── No match ── */
+  .no-match {
+    background: var(--sand);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+  }
+  .no-match p { font-size: 14px; color: var(--text-mid); line-height: 1.7; }
+
+  /* ── Download buttons ── */
+  .download-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+  .dl-btn {
+    flex: 1;
+    min-width: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    border: none;
+  }
+  .dl-btn-pdf {
+    background: var(--navy);
+    color: #fff;
+  }
+  .dl-btn-pdf:hover { opacity: 0.88; }
+  .dl-btn-copy {
+    background: var(--sand);
+    color: var(--navy);
+    border: 0.5px solid var(--border-strong);
+  }
+  .dl-btn-copy:hover { background: var(--light-gold); }
+  .dl-btn svg { flex-shrink: 0; }
+  .copy-confirm {
+    font-size: 12px;
+    color: var(--success);
+    text-align: center;
+    margin-top: 8px;
+    height: 18px;
+    transition: opacity 0.3s;
+  }
+
+  /* ── Print styles (PDF) ── */
+  @media print {
+    header, .tagline-strip, main > .form-card,
+    main > .grid-2, main > .generate-btn,
+    .result-header, .chips, .nutrition-panel,
+    .divider, .section-label, .ingredients-list,
+    .steps-list, .info-box, .actions,
+    .download-row, .copy-confirm, footer,
+    .grocery-top .grocery-hint { display: none !important; }
+    body { background: #fff; font-family: 'DM Sans', sans-serif; }
+    main { padding: 0; max-width: 100%; }
+    #result { display: block !important; margin: 0; }
+    .grocery-card {
+      border: none !important;
+      margin: 0 !important;
+      box-shadow: none;
+    }
+    .grocery-top {
+      background: #2C2C3E !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      padding: 1rem !important;
+    }
+    .grocery-top-title { font-size: 18px !important; }
+    .grocery-body { padding: 1rem !important; }
+    .grocery-item { padding: 6px 0 !important; }
+    .grocery-item input { display: none; }
+    .grocery-item label::before {
+      content: '☐ ';
+      font-size: 14px;
+    }
+    .grocery-item label.done::before { content: '☑ '; }
+    .grocery-footer { background: #F5EDE3 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .have-badge { display: none; }
+    .print-meal-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: #2C2C3E;
+      padding: 0.75rem 1.5rem;
+      background: #F5EDE3;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    padding: 2rem 1rem;
+    background: var(--navy);
+    font-size: 11px;
+    color: var(--light-gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="brand-eyebrow">The Thriving Woman Reset</p>
+  <h1 class="brand-title">Fridge-to-Meal <em>Generator</em></h1>
+  <p class="brand-sub">Tell us what you have. We'll handle the rest.</p>
+</header>
+<div class="tagline-strip">Money &nbsp;·&nbsp; Meals &nbsp;·&nbsp; Me Time</div>
+
+<main>
+
+  <!-- Ingredients -->
+  <div class="form-card">
+    <label class="form-label" for="ingredients">What's in your fridge?</label>
+    <textarea class="ingredient-input" id="ingredients"
+      placeholder="e.g. chicken, rice, spinach, garlic, eggs, olive oil, tomatoes..."></textarea>
+  </div>
+
+  <!-- Time + Energy -->
+  <div class="grid-2">
+    <div class="form-card">
+      <span class="form-label">Time available</span>
+      <div class="pill-row" id="time-group">
+        <button class="pill on" data-val="15">15 min</button>
+        <button class="pill" data-val="30">30 min</button>
+        <button class="pill" data-val="45">45 min</button>
+        <button class="pill" data-val="60">60+ min</button>
+      </div>
+    </div>
+    <div class="form-card">
+      <span class="form-label">Energy level</span>
+      <div class="pill-row" id="energy-group">
+        <button class="pill on" data-val="exhausted">Exhausted</button>
+        <button class="pill" data-val="moderate">Moderate</button>
+        <button class="pill" data-val="energized">Energized</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dietary -->
+  <div class="form-card">
+    <span class="form-label">Dietary preference</span>
+    <div class="pill-row" id="diet-group">
+      <button class="pill on" data-val="none">No restrictions</button>
+      <button class="pill" data-val="vegetarian">Vegetarian</button>
+      <button class="pill" data-val="vegan">Vegan</button>
+      <button class="pill" data-val="pescetarian">Pescetarian</button>
+      <button class="pill" data-val="gluten-free">Gluten-free</button>
+      <button class="pill" data-val="dairy-free">Dairy-free</button>
+      <button class="pill" data-val="keto">Keto</button>
+      <button class="pill" data-val="paleo">Paleo</button>
+      <button class="pill" data-val="low-carb">Low carb</button>
+      <button class="pill" data-val="high-protein">High protein</button>
+      <button class="pill" data-val="nut-free">Nut-free</button>
+    </div>
+  </div>
+
+  <!-- Goal + Budget -->
+  <div class="grid-2">
+    <div class="form-card">
+      <span class="form-label">Nutrition goal</span>
+      <div class="pill-row" id="goal-group">
+        <button class="pill on" data-val="none">No goal</button>
+        <button class="pill" data-val="weight-loss">Weight loss</button>
+        <button class="pill" data-val="muscle">Muscle building</button>
+        <button class="pill" data-val="low-sugar">Low sugar</button>
+        <button class="pill" data-val="heart-healthy">Heart healthy</button>
+        <button class="pill" data-val="energy">Energy boost</button>
+      </div>
+    </div>
+    <div class="form-card">
+      <span class="form-label">Budget per serving <span class="new-tag">New</span></span>
+      <div class="pill-row" id="budget-group">
+        <button class="pill on" data-val="any">No limit</button>
+        <button class="pill" data-val="5">Under $5</button>
+        <button class="pill" data-val="10">Under $10</button>
+        <button class="pill" data-val="15">Under $15</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="generate-btn" onclick="generate()">Generate my meal + grocery list →</button>
+
+  <!-- Result -->
+  <div id="result">
+    <div id="result-inner"></div>
+  </div>
+
+</main>
+
+<footer>© The Thriving Woman Reset™ &nbsp;·&nbsp; thethrivingwomanreset.com</footer>
+
+<script>
+// ── Pill setup ──────────────────────────────────────────────
+function setupPills(id, multi) {
+  var group = document.getElementById(id);
+  group.querySelectorAll('.pill').forEach(function(p) {
+    p.addEventListener('click', function() {
+      if (!multi) group.querySelectorAll('.pill').forEach(function(x){ x.classList.remove('on'); });
+      p.classList.toggle('on');
+    });
+  });
+}
+setupPills('time-group', false);
+setupPills('energy-group', false);
+setupPills('diet-group', false);
+setupPills('goal-group', false);
+setupPills('budget-group', false);
+
+function getVal(id) {
+  var el = document.querySelector('#' + id + ' .pill.on');
+  return el ? el.dataset.val : null;
+}
+
+// ── Recipe database ─────────────────────────────────────────
+var ALIASES = {
+  'breast':'chicken','thigh':'chicken','drumstick':'chicken','rotisserie':'chicken',
+  'chuck':'beef','sirloin':'beef','steak':'beef','ground beef':'beef','mince':'beef',
+  'ground turkey':'turkey','turkey breast':'turkey','turkey mince':'turkey',
+  'ground pork':'pork','pork chop':'pork','pork loin':'pork','pork belly':'pork','bacon':'pork','ham':'pork',
+  'ground lamb':'lamb','lamb chop':'lamb','lamb mince':'lamb',
+  'cod':'white fish','tilapia':'white fish','halibut':'white fish','sea bass':'white fish','snapper':'white fish','haddock':'white fish',
+  'canned tuna':'tuna','tuna steak':'tuna','albacore':'tuna',
+  'baby spinach':'spinach','fresh spinach':'spinach',
+  'cherry tomatoes':'tomato','roma tomatoes':'tomato','canned tomatoes':'tomato','tomato paste':'tomato',
+  'white rice':'rice','jasmine rice':'rice','basmati rice':'rice','brown rice':'rice','cauliflower rice':'rice',
+  'spaghetti':'pasta','penne':'pasta','fettuccine':'pasta','linguine':'pasta','rigatoni':'pasta','farfalle':'pasta','fusilli':'pasta','noodles':'pasta',
+  'firm tofu':'tofu','silken tofu':'tofu','extra firm tofu':'tofu',
+  'black beans':'beans','kidney beans':'beans','pinto beans':'beans','chickpeas':'chickpeas',
+  'greek yogurt':'yogurt','plain yogurt':'yogurt',
+  'cheddar':'cheese','mozzarella':'cheese','parmesan':'cheese','feta':'cheese','gouda':'cheese',
+  'sweet potato':'sweet potato','yam':'sweet potato',
+  'broccoli florets':'broccoli','broccolini':'broccoli',
+  'button mushrooms':'mushrooms','cremini':'mushrooms','shiitake':'mushrooms','portobello':'mushrooms',
+  'red onion':'onion','yellow onion':'onion','green onion':'onion','scallion':'onion','shallot':'onion',
+  'red pepper':'bell pepper','green pepper':'bell pepper','yellow pepper':'bell pepper','capsicum':'bell pepper',
+  'kale':'kale','baby kale':'kale',
+  'zucchini':'zucchini','courgette':'zucchini',
+  'eggplant':'eggplant','aubergine':'eggplant',
+  'blueberries':'blueberries','strawberries':'strawberries','raspberries':'raspberries','mixed berries':'berries','berries':'berries',
+  'banana':'banana','plantain':'banana',
+  'avocado':'avocado','guacamole':'avocado',
+  'coconut milk':'coconut milk','coconut cream':'coconut milk',
+  'lentils':'lentils','red lentils':'lentils','green lentils':'lentils',
+  'edamame':'edamame','snap peas':'peas','frozen peas':'peas',
+  'quinoa':'quinoa',
+  'oats':'oats','rolled oats':'oats','oatmeal':'oats',
+  'butter':'butter','unsalted butter':'butter',
+  'heavy cream':'cream','heavy whipping cream':'cream','half and half':'cream',
+  'milk':'milk','whole milk':'milk','almond milk':'milk',
+  'cottage cheese':'cottage cheese',
+  'sour cream':'sour cream',
+  'asparagus':'asparagus',
+  'brussels sprouts':'brussels sprouts',
+  'cauliflower':'cauliflower',
+  'carrots':'carrots','baby carrots':'carrots',
+  'celery':'celery',
+  'peas':'peas','snow peas':'peas',
+  'bok choy':'bok choy',
+  'cabbage':'cabbage','napa cabbage':'cabbage','red cabbage':'cabbage',
+  'mango':'mango','frozen mango':'mango',
+  'pineapple':'pineapple','canned pineapple':'pineapple',
+  'apple':'apple','granny smith':'apple',
+  'lemon':'lemon','lemon juice':'lemon',
+  'lime':'lime','lime juice':'lime',
+  'orange':'orange','orange juice':'orange',
+  'garlic':'garlic','garlic powder':'garlic','minced garlic':'garlic',
+  'ginger':'ginger','fresh ginger':'ginger','ground ginger':'ginger',
+  'soy sauce':'soy sauce','tamari':'soy sauce',
+  'bread':'bread','whole wheat bread':'bread','sourdough':'bread','pita':'bread','tortilla':'bread','naan':'bread',
+  'eggs':'eggs','egg whites':'eggs','hard boiled eggs':'eggs'
+};
+
+function normalizeIngredient(raw) {
+  var s = raw.toLowerCase().trim();
+  if (ALIASES[s]) return ALIASES[s];
+  for (var alias in ALIASES) {
+    if (s.includes(alias)) return ALIASES[alias];
+  }
+  return s;
+}
+
+var RECIPES = [
+
+  /* ═══════════════════════════════════════════
+     CHICKEN
+  ═══════════════════════════════════════════ */
+  {
+    name: "Lemon Herb Chicken Skillet over Rice",
+    cuisine: "American", time: 30, energy: ["exhausted","moderate"],
+    dietary: ["none","dairy-free","gluten-free","high-protein","paleo"],
+    key: ["chicken","rice","spinach","tomato","garlic","lemon"],
+    nutrition: { cal:490, protein:"38g", carbs:"48g", fat:"13g", sugar:"5g", fiber:"5g" },
+    vibe: "Simple, clean, and satisfying — the kind of dinner that makes you feel like you've got it together.",
+    servings: "2 servings",
+    steps: ["Start rice — set it and forget it for 18 min.","Slice chicken, season with salt, pepper, garlic powder, Italian seasoning.","Heat olive oil in skillet over medium-high. Cook chicken 5–6 min until golden.","Add garlic and tomatoes. Simmer 3–4 min until tomatoes soften.","Toss in spinach, stir 1–2 min until wilted.","Squeeze lemon over everything. Serve over rice."],
+    ingredients: ["2 chicken breasts, sliced","1 cup rice (dry)","2 cups spinach","2 tomatoes, diced","2 garlic cloves","½ lemon, juiced","Olive oil, Italian seasoning, salt, pepper"],
+    tip: "Add a pinch of red pepper flakes with the tomatoes — deepens flavor without extra effort.",
+    leftover: "Chop chicken smaller tomorrow for a quick lunch bowl.",
+    grocery: { protein:[{name:"Chicken breasts — 2",have:true}], produce:[{name:"Spinach — 2 cups",have:true},{name:"Tomatoes — 2",have:true},{name:"Lemon — 1",have:false},{name:"Garlic — 2 cloves",have:false}], grains:[{name:"Rice — 1 cup dry",have:true}], pantry:[{name:"Olive oil",have:false},{name:"Italian seasoning",have:false},{name:"Salt & pepper",have:false}], dairy:[], canned:[] }
+  },
+  {
+    name: "One-Pan Chicken Fajita Bowl",
+    cuisine: "Mexican", time: 25, energy: ["exhausted","moderate"],
+    dietary: ["none","dairy-free","gluten-free","high-protein","paleo"],
+    key: ["chicken","bell pepper","onion","rice","corn","lime"],
+    nutrition: { cal:520, protein:"38g", carbs:"55g", fat:"13g", sugar:"7g", fiber:"5g" },
+    vibe: "Smoky, colorful, and satisfying — your favorite restaurant bowl, done at home in under 30.",
+    servings: "2 servings",
+    steps: ["Cook rice per package directions.","Slice chicken thin. Season with cumin, chili powder, garlic powder, salt.","High heat + oil. Cook chicken 5–6 min. Set aside.","Add bell peppers and onion to same pan. Cook 3–4 min until slightly charred.","Return chicken, add corn, toss 1 min.","Serve over rice with lime squeezed on top."],
+    ingredients: ["2 chicken breasts, thin sliced","1 cup rice","2 bell peppers, sliced","1 onion, sliced","½ cup corn","1 lime","1 tsp cumin, 1 tsp chili powder, ½ tsp garlic powder","Olive oil, salt, pepper"],
+    tip: "Get the pan screaming hot before peppers go in — that char is what makes fajitas taste like fajitas.",
+    leftover: "Wrap in foil for work lunch — reheats perfectly.",
+    grocery: { protein:[{name:"Chicken breasts — 2",have:true}], produce:[{name:"Bell peppers — 2",have:true},{name:"Onion — 1",have:false},{name:"Lime — 1",have:false}], grains:[{name:"Rice — 1 cup",have:true}], pantry:[{name:"Olive oil",have:false},{name:"Cumin, chili powder, garlic powder",have:false}], dairy:[], canned:[{name:"Corn — ½ cup",have:false}] }
+  },
+  {
+    name: "Chicken & Broccoli Stir Fry",
+    cuisine: "Chinese-American", time: 20, energy: ["exhausted","moderate"],
+    dietary: ["none","dairy-free","high-protein"],
+    key: ["chicken","broccoli","soy sauce","garlic","ginger","rice"],
+    nutrition: { cal:460, protein:"40g", carbs:"45g", fat:"11g", sugar:"6g", fiber:"5g" },
+    vibe: "Better than takeout, ready in 20 minutes — garlicky, glossy, and deeply satisfying.",
+    servings: "2 servings",
+    steps: ["Cook rice per package directions.","Mix sauce: 3 tbsp soy sauce, 1 tbsp honey, 1 tsp sesame oil, 1 tsp cornstarch, splash of water.","Slice chicken thin. High heat + oil. Cook 4–5 min until golden. Set aside.","Add broccoli, garlic, ginger. Stir fry 3 min.","Return chicken, pour sauce over, toss 1–2 min until glossy.","Serve over rice."],
+    ingredients: ["2 chicken breasts, thin sliced","2 cups broccoli florets","1 cup rice","3 tbsp soy sauce","1 tbsp honey","1 tsp sesame oil","3 garlic cloves, minced","1 tsp fresh ginger","1 tsp cornstarch","Vegetable oil"],
+    tip: "Don't steam the broccoli — let it char slightly in the hot pan for better texture and flavor.",
+    leftover: "Tastes even better next day — the sauce soaks into everything overnight.",
+    grocery: { protein:[{name:"Chicken breasts — 2",have:true}], produce:[{name:"Broccoli — 2 cups florets",have:true},{name:"Garlic — 3 cloves",have:false},{name:"Fresh ginger (optional)",have:false}], grains:[{name:"Rice — 1 cup",have:true}], pantry:[{name:"Soy sauce",have:false},{name:"Honey",have:false},{name:"Sesame oil",have:false},{name:"Cornstarch",have:false},{name:"Vegetable oil",have:false}], dairy:[], canned:[] }
+  },
+  {
+    name: "Greek Chicken Bowl with Tzatziki",
+    cuisine: "Greek", time: 30, energy: ["moderate","energized"],
+    dietary: ["none","gluten-free","high-protein"],
+    key: ["chicken","yogurt","cucumber","tomato","rice","garlic","lemon","cheese","feta"],
+    nutrition: { cal:510, protein:"42g", carbs:"42g", fat:"16g", sugar:"6g", fiber:"4g" },
+    vibe: "Sun-soaked Mediterranean flavors — feels like a vacation dinner on a Tuesday.",
+    servings: "2 servings",
+    steps: ["Marinate chicken: olive oil, lemon, garlic, oregano, salt, pepper. 10 min minimum.","Cook rice.","Grill or pan-sear chicken 5–6 min per side. Rest 2 min, then slice.","Make tzatziki: yogurt + grated cucumber + garlic + lemon + dill + salt.","Build bowl: rice, sliced chicken, tomatoes, cucumber, olives if you have them.","Drizzle tzatziki generously over everything."],
+    ingredients: ["2 chicken breasts","1 cup rice","½ cup plain yogurt","1 cucumber, grated + diced","2 tomatoes, diced","1 lemon","3 garlic cloves","2 tbsp olive oil","1 tsp dried oregano","1 tsp dill","Feta cheese (optional)","Salt, pepper"],
+    tip: "Squeeze excess water from grated cucumber before mixing into yogurt — otherwise tzatziki goes watery.",
+    leftover: "Store tzatziki separately — it keeps 3 days and works as a dip or spread too.",
+    grocery: { protein:[{name:"Chicken breasts — 2",have:true}], produce:[{name:"Cucumber — 1",have:true},{name:"Tomatoes — 2",have:true},{name:"Lemon — 1",have:false},{name:"Garlic — 3 cloves",have:false}], grains:[{name:"Rice — 1 cup",have:true}], pantry:[{name:"Olive oil",have:false},{name:"Dried oregano, dill",have:false},{name:"Salt & pepper",have:false}], dairy:[{name:"Plain yogurt — ½ cup",have:false},{name:"Feta cheese (optional)",have:false}], canned:[] }
+  },
+  {
+    name: "Chicken Tikka Masala with Rice",
+    cuisine: "Indian", time: 35, energy: ["moderate","energized"],
+    dietary: ["none","gluten-free","high-protein"],
+    key: ["chicken","tomato","yogurt","garlic","ginger","cream","milk","rice","onion"],
+    nutrition: { cal:580, protein:"40g", carbs:"50g", fat:"22g", sugar:"10g", fiber:"4g" },
+    vibe: "Bold, aromatic, warmly spiced — the dinner that earns you compliments without the restaurant bill.",
+    servings: "2 servings",
+    steps: ["Cook rice. Marinate chicken cubes in yogurt + cumin + paprika + garlic + ginger + salt — 10 min.","Heat oil in pan over high heat. Sear chicken until charred, 4–5 min. Set aside.","In same pan: sauté onion 3 min. Add garlic, ginger, garam masala, cumin, paprika, turmeric. Cook 1 min.","Add tomatoes (crushed or diced). Simmer 5 min.","Add chicken back + splash of cream or milk. Simmer 5 more min.","Serve over rice with fresh cilantro if you have it."],
+    ingredients: ["2 chicken breasts, cubed","1 cup rice","1 can crushed tomatoes or 3 tomatoes","½ cup yogurt","¼ cup cream or milk","1 onion, diced","4 garlic cloves","1 tsp fresh ginger","1 tsp garam masala","1 tsp cumin","1 tsp paprika","½ tsp turmeric","Oil, salt"],
+    tip: "Don't skip charring the chicken — those slightly blackened bits are where the tikka flavor lives.",
+    leftover: "Tikka masala deepens overnight. Make double and freeze the rest for future-you.",
+    grocery: { protein:[{name:"Chicken breasts — 2",have:true}], produce:[{name:"Onion — 1",have:false},{name:"Garlic — 4 cloves",have:false},{name:"Fresh ginger",have:false},{name:"Fresh cilantro (optional)",have:false}], grains:[{name:"Rice — 1 cup",have:true}], pantry:[{name:"Oil",have:false},{name:"Garam masala, cumin, paprika, turmeric",have:false},{name:"Salt",have:false}], dairy:[{name:"Yogurt — ½ cup",have:false},{name:"Cream or milk — ¼ cup",have:false}], canned:[{name:"Crushed tomatoes — 1 can",have:false}] }
+  },
+  {
+    name: "Thai Basil Chicken (Pad Kra Pao)",
+    cuisine: "Thai", time: 20, energy: ["exhausted","moderate"],
+    dietary: ["none","dairy-free","high-protein"],
+    key: ["chicken","basil","garlic","soy sauce","rice","bell pepper","onion","eggs"],
+    nutrition: { cal:470, protein:"36g", carbs:"48g", fat:"14g", sugar:"5g", fiber:"2g" },
+    vibe: "Street food energy, weeknight speed — bold, garlicky, and addictively good.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Make sauce: 2 tbsp soy sauce, 1 tbsp oyster sauce (or extra soy), 1 tsp fish sauce (optional), 1 tsp sugar.","High heat + oil. Fry ground chicken 4–5 min breaking up. Add garlic, chili.","Add bell pepper and onion. Stir fry 2 min.","Pour sauce over. Toss 1 min.","Add fresh basil, stir until wilted. Serve over rice with a fried egg on top if you have eggs."],
+    ingredients: ["¾ lb ground chicken or sliced chicken","1 cup rice","1 cup fresh basil (or 1 tsp dried)","3 garlic cloves, minced","1 bell pepper, sliced","½ onion, sliced","2 tbsp soy sauce","1 tbsp oyster sauce","1 tsp sugar","2 eggs (optional, for topping)","Oil, chili flakes"],
+    tip: "The fried egg on top is not optional in Thailand — the runny yolk becomes the sauce. Trust it.",
+    leftover: "Reheat in a hot pan to revive the texture — microwaving makes it soggy.",
+    grocery: { protein:[{name:"Ground or sliced chicken — ¾ lb",have:true}], produce:[{name:"Bell pepper — 1",have:true},{name:"Onion — ½",have:false},{name:"Garlic — 3 cloves",have:false},{name:"Fresh basil (or dried)",have:false}], grains:[{name:"Rice — 1 cup",have:true}], pantry:[{name:"Soy sauce",have:false},{name:"Oyster sauce",have:false},{name:"Sugar",have:false},{name:"Oil, chili flakes",have:false}], dairy:[], canned:[] }
+  },
+  {
+    name: "Jerk Chicken Rice Bowl",
+    cuisine: "Caribbean", time: 35, energy: ["moderate","energized"],
+    dietary: ["none","dairy-free","gluten-free","high-protein","paleo"],
+    key: ["chicken","rice","corn","bell pepper","lime","pineapple","mango","onion"],
+    nutrition: { cal:530, protein:"38g", carbs:"58g", fat:"13g", sugar:"12g", fiber:"5g" },
+    vibe: "Island-inspired heat and sweetness — feels like summer no matter what month it is.",
+    servings: "2 servings",
+    steps: ["Make jerk rub: allspice, thyme, garlic powder, onion powder, cinnamon, cayenne, brown sugar, salt, pepper. Rub all over chicken.","Cook rice with a splash of coconut milk if you have it.","Grill or pan-sear chicken 6–7 min per side. Rest and slice.","Make fresh salsa: diced mango or pineapple + red onion + lime + cilantro.","Bowl: rice, jerk chicken, salsa, corn.","Squeeze lime over everything."],
+    ingredients: ["2 chicken breasts","1 cup rice","1 mango or ½ cup pineapple, diced","1 red onion","½ cup corn","1 lime","Fresh cilantro (optional)","Jerk spice blend: allspice, thyme, garlic powder, cayenne, brown sugar, cinnamon, salt, pepper"],
+    tip: "The longer the jerk rub sits, the deeper the flavor. Even 5 minutes is worth it.",
+    leftover: "Slice cold jerk chicken thin over a salad tomorrow — the spice is even better the next day.",
+    grocery: { protein:[{name:"Chicken breasts — 2",have:true}], produce:[{name:"Mango or pineapple",have:false},{name:"Red onion — 1",have:false},{name:"Lime — 1",have:false},{name:"Cilantro (optional)",have:false}], grains:[{name:"Rice — 1 cup",have:true}], pantry:[{name:"Allspice, thyme, cayenne, cinnamon, brown sugar",have:false},{name:"Salt & pepper",have:false}], dairy:[], canned:[{name:"Corn — ½ cup",have:false}] }
+  },
+  {
+    name: "Chicken Shawarma Bowl",
+    cuisine: "Middle Eastern", time: 30, energy: ["moderate","energized"],
+    dietary: ["none","dairy-free","gluten-free","high-protein"],
+    key: ["chicken","yogurt","cucumber","tomato","lemon","garlic","rice","onion"],
+    nutrition: { cal:500, protein:"40g", carbs:"45g", fat:"15g", sugar:"5g", fiber:"4g" },
+    vibe: "Warmly spiced, aromatic, and deeply satisfying — Middle Eastern street food at home.",
+    servings: "2 servings",
+    steps: ["Marinate chicken: cumin, coriander, turmeric, paprika, cinnamon, garlic, lemon, olive oil, salt.","Cook rice.","Pan-sear chicken 5–6 min per side. Rest and slice thin.","Make garlic sauce: yogurt + garlic + lemon + salt.","Build bowl: rice, sliced chicken, tomato, cucumber, onion.","Drizzle garlic sauce generously over the top."],
+    ingredients: ["2 chicken breasts","1 cup rice","1 cucumber, diced","2 tomatoes, diced","½ red onion, thin sliced","½ cup yogurt","1 lemon","4 garlic cloves","1 tsp each cumin, coriander, paprika, turmeric","Pinch cinnamon","Olive oil, salt"],
+    tip: "Slice the chicken as thin as possible when serving — it's all about those thin shaved layers.",
+    leftover: "Stuff leftovers in pita bread with extra sauce for a next-day lunch wrap.",
+    grocery: { protein:[{name:"Chicken breasts — 2",have:true}], produce:[{name:"Cucumber — 1",have:true},{name:"Tomatoes — 2",have:true},{name:"Red onion — ½",have:false},{name:"Lemon — 1",have:false},{name:"Garlic — 4 cloves",have:false}], grains:[{name:"Rice — 1 cup",have:true}], pantry:[{name:"Olive oil",have:false},{name:"Cumin, coriander, turmeric, paprika, cinnamon",have:false}], dairy:[{name:"Plain yogurt — ½ cup",have:false}], canned:[] }
+  },
+  {
+    name: "Honey Garlic Chicken Thighs",
+    cuisine: "American", time: 30, energy: ["moderate"],
+    dietary: ["none","dairy-free","gluten-free","high-protein"],
+    key: ["chicken","garlic","honey","soy sauce","rice","broccoli","green beans"],
+    nutrition: { cal:510, protein:"36g", carbs:"52g", fat:"14g", sugar:"14g", fiber:"3g" },
+    vibe: "Sweet, sticky, irresistible — the kind of dinner the whole house smells amazing for.",
+    servings: "2 servings",
+    steps: ["Mix sauce: 3 tbsp honey, 2 tbsp soy sauce, 4 garlic cloves minced, squeeze of lemon.","Season chicken with salt and pepper.","Heat oil in oven-safe skillet over medium-high. Sear chicken skin-side down 4–5 min until golden.","Flip, pour honey garlic sauce over. Transfer to 400°F oven for 15 min (or cover and cook on stovetop).","Cook rice and steam any veggies on the side.","Spoon extra sauce from pan over everything when serving."],
+    ingredients: ["4 chicken thighs (bone-in or boneless)","1 cup rice","3 tbsp honey","2 tbsp soy sauce","4 garlic cloves, minced","1 lemon","Side veg: broccoli or green beans","Oil, salt, pepper"],
+    tip: "Baste the chicken with the pan sauce halfway through cooking — it caramelizes into something incredible.",
+    leftover: "Shred leftover chicken and toss with sauce — perfect over rice or in a wrap.",
+    grocery: { protein:[{name:"Chicken thighs — 4",have:true}], produce:[{name:"Garlic — 4 cloves",have:false},{name:"Lemon — 1",have:false},{name:"Broccoli or green beans (side)",have:false}], grains:[{name:"Rice — 1 cup",have:true}], pantry:[{name:"Honey",have:false},{name:"Soy sauce",have:false},{name:"Oil, salt, pepper",have:false}], dairy:[], canned:[] }
+  },
+
+  /* ═══════════════════════════════════════════
+     TURKEY
+  ═══════════════════════════════════════════ */
+  {
+    name: "Ground Turkey Taco Rice Bowl",
+    cuisine: "Mexican", time: 20, energy: ["exhausted","moderate"],
+    dietary: ["none","gluten-free","high-protein","dairy-free"],
+    key: ["turkey","rice","corn","tomato","bell pepper","lime","cheese"],
+    nutrition: { cal:480, protein:"38g", carbs:"48g", fat:"12g", sugar:"5g", fiber:"5g" },
+    vibe: "Lighter than beef, just as satisfying — taco night made simple and wholesome.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Brown ground turkey over medium-high 6–7 min, breaking it up.","Season with cumin, chili powder, garlic powder, onion powder, salt.","Add tomatoes and corn. Simmer 3–4 min.","Serve over rice. Top with cheese, salsa, lime."],
+    ingredients: ["¾ lb ground turkey","1 cup rice","2 tomatoes, diced","½ cup corn","1 bell pepper, diced","1 lime","1 tsp cumin, 1 tsp chili powder, ½ tsp garlic powder","Salt, olive oil"],
+    tip: "Turkey is leaner than beef — don't overcook or it dries out. Pull it off heat as soon as it's cooked through.",
+    leftover: "Turkey mixture freezes beautifully. Bag it for a 5-minute dinner next week.",
+    grocery: { protein:[{name:"Ground turkey — ¾ lb",have:true}], produce:[{name:"Tomatoes — 2",have:false},{name:"Bell pepper — 1",have:false},{name:"Lime — 1",have:false}], grains:[{name:"Rice — 1 cup",have:true}], pantry:[{name:"Cumin, chili powder, garlic powder",have:false},{name:"Salt, olive oil",have:false}], dairy:[{name:"Shredded cheese (optional)",have:false}], canned:[{name:"Corn — ½ cup",have:false}] }
+  },
+  {
+    name: "Turkey & Spinach Skillet over Rice",
+    cuisine: "Italian-American", time: 25, energy: ["exhausted","moderate"],
+    dietary: ["none","gluten-free","dairy-free","high-protein"],
+    key: ["turkey","spinach","tomato","garlic","rice","onion"],
+    nutrition: { cal:460, protein:"42g", carbs:"46g", fat:"11g", sugar:"5g", fiber:"4g" },
+    vibe: "Clean, garlicky, and nourishing — a warm hug of a weeknight dinner.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Brown turkey in olive oil 6–7 min, breaking it up.","Add garlic and tomatoes. Simmer 3–4 min.","Toss in spinach, stir until wilted 1–2 min.","Season with Italian seasoning, salt, pepper. Serve over rice."],
+    ingredients: ["¾ lb ground turkey","1 cup rice","2 cups spinach","2 tomatoes","2 garlic cloves","1 tsp Italian seasoning","Olive oil, salt, pepper"],
+    tip: "A splash of chicken broth when the tomatoes go in adds depth without extra effort.",
+    leftover: "Better the next day — flavors meld overnight. Perfect lunch bowl.",
+    grocery: { protein:[{name:"Ground turkey — ¾ lb",have:true}], produce:[{name:"Spinach — 2 cups",have:true},{name:"Tomatoes — 2",have:true},{name:"Garlic — 2 cloves",have:false}], grains:[{name:"Rice — 1 cup",have:true}], pantry:[{name:"Olive oil, Italian seasoning, salt, pepper",have:false}], dairy:[], canned:[] }
+  },
+  {
+    name: "Turkey Stuffed Bell Peppers",
+    cuisine: "American", time: 45, energy: ["moderate","energized"],
+    dietary: ["none","gluten-free","high-protein"],
+    key: ["turkey","bell pepper","rice","tomato","cheese","onion"],
+    nutrition: { cal:420, protein:"38g", carbs:"30g", fat:"14g", sugar:"7g", fiber:"5g" },
+    vibe: "Looks impressive, cooks itself — the dinner that makes you feel like you have it together.",
+    servings: "2 servings",
+    steps: ["Preheat oven to 375°F. Cook rice.","Halve bell peppers lengthwise, remove seeds, place cut-side up in baking dish.","Brown turkey 6–7 min. Season with cumin, garlic powder, salt, pepper.","Mix in tomatoes and rice. Taste and adjust.","Fill peppers. Top with shredded cheese.","Cover with foil. Bake 25 min. Uncover last 5 min."],
+    ingredients: ["¾ lb ground turkey","3 large bell peppers","½ cup rice (dry)","2 tomatoes, diced","¼ cup shredded cheese","1 tsp cumin, garlic powder","Olive oil, salt, pepper"],
+    tip: "Use different colored peppers — red and yellow are sweeter and look beautiful on the plate.",
+    leftover: "Reheat covered with a damp paper towel — stays moist.",
+    grocery: { protein:[{name:"Ground turkey — ¾ lb",have:true}], produce:[{name:"Bell peppers — 3 large",have:true},{name:"Tomatoes — 2",have:false}], grains:[{name:"Rice — ½ cup",have:true}], pantry:[{name:"Olive oil, cumin, garlic powder, salt, pepper",have:false}], dairy:[{name:"Shredded cheese — ¼ cup",have:false}], canned:[] }
+  },
+  {
+    name: "Turkey & Veggie Rice Bowl",
+    cuisine: "American", time: 25, energy: ["exhausted","moderate"],
+    dietary: ["none","gluten-free","dairy-free","high-protein","paleo"],
+    key: ["turkey","rice","zucchini","broccoli","green beans","spinach","carrots","bell pepper"],
+    nutrition: { cal:445, protein:"40g", carbs:"45g", fat:"10g", sugar:"4g", fiber:"5g" },
+    vibe: "Clean, simple, nourishing — the weeknight meal that makes you feel genuinely good.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Brown turkey in olive oil 6–7 min. Season with garlic powder, Italian seasoning, salt.","Add your vegetables. Heartier ones first (broccoli, carrots), leafy last (spinach).","Stir and cook 3–4 min.","Serve over rice. Drizzle with olive oil and lemon."],
+    ingredients: ["¾ lb ground turkey","1 cup rice","2 cups mixed vegetables","1 tsp garlic powder, Italian seasoning","Olive oil, salt, pepper","Lemon juice (optional)"],
+    tip: "Add veggies in stages — harder vegetables need 3–4 min, leafy greens need just 60 seconds.",
+    leftover: "Packs perfectly for lunch. Add a drizzle of hot sauce to revive.",
+    grocery: { protein:[{name:"Ground turkey — ¾ lb",have:true}], produce:[{name:"Mixed vegetables — 2 cups",have:false},{name:"Lemon (optional)",have:false}], grains:[{name:"Rice — 1 cup",have:true}], pantry:[{name:"Olive oil, garlic powder, Italian seasoning, salt",have:false}], dairy:[], canned:[] }
+  },
+
+  /* ═══════════════════════════════════════════
+     BEEF
+  ═══════════════════════════════════════════ */
+  {
+    name: "Ground Beef Taco Rice Bowl",
+    cuisine: "Mexican", time: 20, energy: ["exhausted","moderate"],
+    dietary: ["none","gluten-free","high-protein"],
+    key: ["beef","rice","corn","tomato","bell pepper","lime","cheese"],
+    nutrition: { cal:570, protein:"35g", carbs:"55g", fat:"22g", sugar:"6g", fiber:"5g" },
+    vibe: "Taco Tuesday energy without the shells — bold, filling, ready before anyone gets hangry.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Brown beef over medium-high, breaking up. Drain fat.","Season with cumin, chili powder, garlic powder, salt.","Add tomatoes and corn. Simmer 3–4 min.","Serve over rice with whatever toppings you have."],
+    ingredients: ["¾ lb ground beef","1 cup rice","2 tomatoes, diced","½ cup corn","1 bell pepper","1 lime","1 tsp cumin, chili powder, garlic powder","Salt, olive oil"],
+    tip: "Let beef sit undisturbed 2–3 min before stirring — that's where the flavor develops.",
+    leftover: "Freeze the beef mixture — future-you will be grateful.",
+    grocery: { protein:[{name:"Ground beef — ¾ lb (80/20)",have:false}], produce:[{name:"Tomatoes — 2",have:false},{name:"Bell pepper — 1",have:false},{name:"Lime — 1",have:false}], grains:[{name:"Rice — 1 cup",have:false}], pantry:[{name:"Cumin, chili powder, garlic powder, salt",have:false}], dairy:[{name:"Cheese (optional topping)",have:false}], canned:[{name:"Corn — ½ cup",have:false}] }
+  },
+  {
+    name: "Beef & Broccoli Stir Fry",
+    cuisine: "Chinese-American", time: 20, energy: ["exhausted","moderate"],
+    dietary: ["none","dairy-free","high-protein"],
+    key: ["beef","broccoli","soy sauce","garlic","ginger","rice"],
+    nutrition: { cal:540, protein:"38g", carbs:"45g", fat:"20g", sugar:"7g", fiber:"4g" },
+    vibe: "Classic takeout energy, home-cooked quality — glossy, garlicky, and done in 20 minutes.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Slice beef thin against the grain. Toss with 1 tbsp soy sauce and cornstarch.","Mix sauce: 3 tbsp soy sauce, 1 tbsp honey, 1 tsp sesame oil, splash water.","High heat oil. Sear beef 2–3 min. Set aside.","Add broccoli + garlic + ginger. Stir fry 3 min.","Return beef. Pour sauce over. Toss 1 min until glossy."],
+    ingredients: ["¾ lb sirloin or flank steak, thin sliced","2 cups broccoli florets","1 cup rice","3 tbsp soy sauce","1 tbsp honey","1 tsp sesame oil","3 garlic cloves","1 tsp ginger","1 tbsp cornstarch","Oil"],
+    tip: "Freeze the beef for 20 min before slicing — it firms up and slices paper thin much easier.",
+    leftover: "Great cold as a next-day salad topping.",
+    grocery: { protein:[{name:"Sirloin or flank steak — ¾ lb",have:false}], produce:[{name:"Broccoli — 2 cups",have:false},{name:"Garlic — 3 cloves",have:false},{name:"Fresh ginger",have:false}], grains:[{name:"Rice — 1 cup",have:false}], pantry:[{name:"Soy sauce, honey, sesame oil, cornstarch",have:false},{name:"Oil",have:false}], dairy:[], canned:[] }
+  },
+  {
+    name: "Korean Beef Rice Bowl (Bulgogi)",
+    cuisine: "Korean", time: 25, energy: ["moderate","energized"],
+    dietary: ["none","dairy-free","high-protein"],
+    key: ["beef","rice","soy sauce","garlic","ginger","onion","pear","apple","carrot","cucumber"],
+    nutrition: { cal:555, protein:"36g", carbs:"52g", fat:"18g", sugar:"14g", fiber:"3g" },
+    vibe: "Sweet, savory, and slightly caramelized — one of the world's most craveable bowls.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Make bulgogi marinade: 3 tbsp soy sauce, 1 tbsp sesame oil, 1 tbsp sugar or honey, 3 garlic cloves, 1 tsp ginger, ½ grated pear or apple (tenderizes the meat).","Marinate thin-sliced beef 10+ min.","High heat pan. Cook beef in batches 2–3 min per batch — don't crowd.","Serve over rice. Garnish with sesame seeds and sliced cucumber or green onion."],
+    ingredients: ["¾ lb beef (sirloin or ribeye), thin sliced","1 cup rice","3 tbsp soy sauce","1 tbsp sesame oil","1 tbsp sugar or honey","3 garlic cloves","1 tsp ginger","½ pear or apple, grated","Sesame seeds, cucumber, green onion for serving"],
+    tip: "The grated pear is the secret — enzymes in the fruit tenderize the beef and add natural sweetness.",
+    leftover: "Cold bulgogi on lettuce leaves makes an incredible next-day lettuce wrap.",
+    grocery: { protein:[{name:"Beef sirloin or ribeye — ¾ lb, thin sliced",have:false}], produce:[{name:"Garlic — 3 cloves",have:false},{name:"Pear or apple — ½",have:false},{name:"Cucumber (garnish)",have:false},{name:"Green onion (garnish)",have:false}], grains:[{name:"Rice — 1 cup",have:false}], pantry:[{name:"Soy sauce, sesame oil, sugar or honey, ginger",have:false}], dairy:[], canned:[] }
+  },
+  {
+    name: "Cuban Picadillo with Rice",
+    cuisine: "Cuban", time: 25, energy: ["moderate"],
+    dietary: ["none","dairy-free","gluten-free","high-protein"],
+    key: ["beef","tomato","onion","garlic","bell pepper","rice","olives","raisins"],
+    nutrition: { cal:520, protein:"32g", carbs:"52g", fat:"18g", sugar:"9g", fiber:"4g" },
+    vibe: "Sweet, savory, and deeply aromatic — this Cuban classic is comfort food at its most sophisticated.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Brown ground beef over medium-high. Drain excess fat.","Add onion, garlic, bell pepper. Cook 3 min.","Add tomatoes, cumin, oregano, bay leaf, olives if you have them, raisins if you have them.","Simmer 10 min. Season with salt and pepper.","Serve over rice."],
+    ingredients: ["¾ lb ground beef","1 cup rice","2 tomatoes, diced (or 1 can)","1 onion, diced","1 bell pepper, diced","3 garlic cloves","1 tsp cumin","1 tsp oregano","¼ cup green olives (optional)","2 tbsp raisins (optional)","Bay leaf, salt, olive oil"],
+    tip: "The olives and raisins aren't optional in a true picadillo — that sweet-salty contrast is the whole point.",
+    leftover: "Picadillo stuffed into a warm tortilla with rice is one of the best lunches imaginable.",
+    grocery: { protein:[{name:"Ground beef — ¾ lb",have:false}], produce:[{name:"Tomatoes — 2",have:false},{name:"Onion — 1",have:false},{name:"Bell pepper — 1",have:false},{name:"Garlic — 3 cloves",have:false}], grains:[{name:"Rice — 1 cup",have:false}], pantry:[{name:"Olive oil, cumin, oregano, bay leaf, salt",have:false},{name:"Green olives (optional)",have:false},{name:"Raisins (optional)",have:false}], dairy:[], canned:[] }
+  },
+  {
+    name: "Beef Bolognese Pasta",
+    cuisine: "Italian", time: 35, energy: ["moderate","energized"],
+    dietary: ["none","high-protein"],
+    key: ["beef","pasta","tomato","onion","garlic","carrot","celery","milk","cream","cheese"],
+    nutrition: { cal:620, protein:"35g", carbs:"65g", fat:"22g", sugar:"10g", fiber:"5g" },
+    vibe: "Italy's most beloved meat sauce — slow-cooked depth in a fraction of the time.",
+    servings: "2 servings",
+    steps: ["Cook pasta per package. Reserve ½ cup pasta water.","Sauté onion, carrot, celery in olive oil 5 min.","Add beef, break up, cook until browned. Drain fat.","Add garlic, cook 1 min. Add tomatoes, splash of milk or cream.","Simmer 15 min, stirring occasionally.","Toss with pasta. Add pasta water to loosen. Top with parmesan."],
+    ingredients: ["½ lb ground beef","6 oz pasta (tagliatelle, pappardelle, or rigatoni)","1 can crushed tomatoes","1 onion, diced","1 carrot, diced","2 celery stalks, diced","3 garlic cloves","¼ cup milk or cream","Parmesan for serving","Olive oil, salt, pepper"],
+    tip: "The milk is what makes it Bolognese — it tenderizes the meat and rounds out the acidity.",
+    leftover: "Bolognese freezes perfectly. Make extra and thank yourself later.",
+    grocery: { protein:[{name:"Ground beef — ½ lb",have:false}], produce:[{name:"Onion — 1",have:false},{name:"Carrot — 1",have:false},{name:"Celery — 2 stalks",have:false},{name:"Garlic — 3 cloves",have:false}], grains:[{name:"Pasta — 6 oz",have:false}], pantry:[{name:"Olive oil, salt, pepper",have:false}], dairy:[{name:"Milk or cream — ¼ cup",have:false},{name:"Parmesan cheese",have:false}], canned:[{name:"Crushed tomatoes — 1 can",have:false}] }
+  },
+
+  /* ═══════════════════════════════════════════
+     PORK
+  ═══════════════════════════════════════════ */
+  {
+    name: "Garlic Pork & Veggie Stir Fry",
+    cuisine: "Asian-American", time: 20, energy: ["exhausted","moderate"],
+    dietary: ["none","dairy-free","high-protein"],
+    key: ["pork","garlic","soy sauce","rice","broccoli","bell pepper","zucchini","cabbage","bok choy"],
+    nutrition: { cal:490, protein:"36g", carbs:"47g", fat:"16g", sugar:"7g", fiber:"4g" },
+    vibe: "Fast, flexible, and full of flavor — use whatever vegetables are in your fridge.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Slice pork thin. Season with salt, pepper, garlic powder.","Make sauce: 3 tbsp soy sauce, 1 tbsp honey, 1 tsp sesame oil.","High heat oil. Cook pork 3–4 min. Set aside.","Add vegetables — heartier first. Stir fry 3–4 min.","Add garlic, return pork, pour sauce. Toss 1 min."],
+    ingredients: ["¾ lb pork tenderloin or chops, thin sliced","1 cup rice","2 cups mixed vegetables","3 garlic cloves","3 tbsp soy sauce","1 tbsp honey","1 tsp sesame oil","Oil, salt, pepper"],
+    tip: "Pork cooks fast — don't walk away from the pan. Overcooked pork is the only mistake you can make here.",
+    leftover: "Reheat in a hot dry pan to restore the texture.",
+    grocery: { protein:[{name:"Pork tenderloin or chops — ¾ lb",have:false}], produce:[{name:"Mixed vegetables — 2 cups",have:false},{name:"Garlic — 3 cloves",have:false}], grains:[{name:"Rice — 1 cup",have:false}], pantry:[{name:"Soy sauce, honey, sesame oil",have:false},{name:"Oil, salt, pepper",have:false}], dairy:[], canned:[] }
+  },
+  {
+    name: "Filipino Pork Adobo Rice Bowl",
+    cuisine: "Filipino", time: 35, energy: ["moderate","energized"],
+    dietary: ["none","dairy-free","gluten-free","high-protein"],
+    key: ["pork","soy sauce","vinegar","garlic","rice","bay leaf","onion"],
+    nutrition: { cal:530, protein:"34g", carbs:"48g", fat:"20g", sugar:"3g", fiber:"2g" },
+    vibe: "Tangy, savory, and deeply comforting — the Philippines' national dish and one of the easiest braises you'll ever make.",
+    servings: "2 servings",
+    steps: ["Cook rice.","In a pot or skillet: combine pork, soy sauce, vinegar, garlic, bay leaves, black pepper. Don't stir yet.","Bring to a boil then lower heat. Simmer covered 20 min.","Uncover, raise heat, cook until sauce reduces and pork caramelizes slightly, 5–10 min.","Serve over rice. Spoon all the sauce over the top."],
+    ingredients: ["¾ lb pork shoulder or belly, cubed","1 cup rice","3 tbsp soy sauce","3 tbsp white vinegar","5 garlic cloves","2 bay leaves","1 tsp black pepper","Optional: 1 tsp sugar"],
+    tip: "Do NOT stir the pot when you first combine everything — letting it marinate for 5 min unmixed builds more flavor.",
+    leftover: "Adobo is one of the rare dishes that gets dramatically better the next day.",
+    grocery: { protein:[{name:"Pork shoulder or belly — ¾ lb",have:false}], produce:[{name:"Garlic — 5 cloves",have:false}], grains:[{name:"Rice — 1 cup",have:false}], pantry:[{name:"Soy sauce — 3 tbsp",have:false},{name:"White vinegar — 3 tbsp",have:false},{name:"Bay leaves, black pepper",have:false}], dairy:[], canned:[] }
+  },
+  {
+    name: "Pork Chops with Apples & Rice",
+    cuisine: "American", time: 30, energy: ["moderate"],
+    dietary: ["none","dairy-free","gluten-free","high-protein"],
+    key: ["pork","apple","onion","rice","garlic","butter","thyme","rosemary"],
+    nutrition: { cal:510, protein:"34g", carbs:"50g", fat:"17g", sugar:"12g", fiber:"3g" },
+    vibe: "Autumn-comfort energy any time of year — sweet apple, savory pork, buttery pan sauce.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Season pork chops with salt, pepper, garlic powder.","Heat oil in skillet over medium-high. Sear pork 3–4 min per side. Set aside.","In same pan, add butter. Sauté onion and apple slices 3–4 min.","Add splash of broth or water, thyme. Simmer 2 min.","Return pork. Cook 2 more min in the sauce. Serve over rice."],
+    ingredients: ["2 pork chops","1 cup rice","1 apple, sliced","1 onion, sliced","1 tbsp butter","2 garlic cloves","½ tsp thyme","Oil, salt, pepper"],
+    tip: "Don't overcook the pork — it only needs to reach 145°F. A little pink inside is perfectly safe and much juicier.",
+    leftover: "Slice pork cold over a green salad with apple and a simple vinaigrette.",
+    grocery: { protein:[{name:"Pork chops — 2",have:false}], produce:[{name:"Apple — 1",have:false},{name:"Onion — 1",have:false},{name:"Garlic — 2 cloves",have:false}], grains:[{name:"Rice — 1 cup",have:false}], pantry:[{name:"Oil, thyme, salt, pepper",have:false}], dairy:[{name:"Butter — 1 tbsp",have:false}], canned:[] }
+  },
+
+  /* ═══════════════════════════════════════════
+     LAMB
+  ═══════════════════════════════════════════ */
+  {
+    name: "Spiced Lamb & Bell Pepper Rice Bowl",
+    cuisine: "Mediterranean", time: 30, energy: ["exhausted","moderate"],
+    dietary: ["none","dairy-free","gluten-free","high-protein"],
+    key: ["lamb","rice","bell pepper","corn","cucumber","tomato"],
+    nutrition: { cal:605, protein:"30g", carbs:"58g", fat:"29g", sugar:"6g", fiber:"4g" },
+    vibe: "Mediterranean-inspired, one pan — warm and savory with a cool fresh finish.",
+    servings: "2 servings",
+    steps: ["Start rice — done right on time.","Brown lamb in olive oil, season with cumin, paprika, garlic powder, salt, pepper.","Cook 5–6 min. Drain fat.","Add bell pepper and corn. Cook 3–4 min.","Dice cucumber with a pinch of salt — cool topping.","Bowl: rice, lamb mixture, cucumber on top."],
+    ingredients: ["¾ lb ground lamb","1 cup rice","1 bell pepper, diced","½ cup corn","½ cucumber, diced","1 tsp cumin, paprika, garlic powder","Olive oil, salt, pepper"],
+    tip: "Don't skip the cucumber — the cool freshness against warm spiced lamb is restaurant-level.",
+    leftover: "Stuff into a pita with cucumber for a 3-minute lunch.",
+    grocery: { protein:[{name:"Ground lamb — ¾ lb",have:true}], produce:[{name:"Bell pepper — 1",have:true},{name:"Cucumber — 1",have:true},{name:"Lemon (optional)",have:false}], grains:[{name:"Rice — 1 cup",have:true}], pantry:[{name:"Olive oil, cumin, paprika, garlic powder",have:false}], dairy:[], canned:[{name:"Corn — ½ cup",have:true}] }
+  },
+  {
+    name: "Moroccan Lamb Tagine Bowl",
+    cuisine: "Moroccan", time: 40, energy: ["moderate","energized"],
+    dietary: ["none","dairy-free","gluten-free","high-protein"],
+    key: ["lamb","tomato","onion","garlic","chickpeas","rice","carrot","raisins","lemon","cinnamon"],
+    nutrition: { cal:580, protein:"34g", carbs:"60g", fat:"20g", sugar:"14g", fiber:"8g" },
+    vibe: "North African warmth — fragrant spices, tender lamb, sweet raisins. Takes you somewhere else entirely.",
+    servings: "2 servings",
+    steps: ["Cook rice or couscous.","Brown lamb cubes in olive oil over high heat. Set aside.","Sauté onion 3 min. Add garlic, cumin, coriander, cinnamon, turmeric. Cook 1 min.","Add tomatoes, carrots, chickpeas, raisins, lamb. Add ½ cup water.","Cover and simmer 20–25 min until lamb is tender.","Squeeze lemon over, serve over rice."],
+    ingredients: ["¾ lb lamb shoulder, cubed","1 cup rice or couscous","1 can chickpeas","1 can diced tomatoes","1 carrot, diced","1 onion, diced","3 garlic cloves","2 tbsp raisins","1 lemon","1 tsp cumin, coriander, cinnamon","½ tsp turmeric","Olive oil, salt, pepper"],
+    tip: "The raisins aren't decoration — they melt into the sauce and balance the spices perfectly.",
+    leftover: "Tagine is even better tomorrow. Make it a day ahead if you can.",
+    grocery: { protein:[{name:"Lamb shoulder — ¾ lb, cubed",have:false}], produce:[{name:"Onion — 1",have:false},{name:"Carrot — 1",have:false},{name:"Garlic — 3 cloves",have:false},{name:"Lemon — 1",have:false}], grains:[{name:"Rice or couscous — 1 cup",have:false}], pantry:[{name:"Olive oil, cumin, coriander, cinnamon, turmeric",have:false},{name:"Raisins — 2 tbsp",have:false}], dairy:[], canned:[{name:"Chickpeas — 1 can",have:false},{name:"Diced tomatoes — 1 can",have:false}] }
+  },
+
+  /* ═══════════════════════════════════════════
+     SALMON & FISH
+  ═══════════════════════════════════════════ */
+  {
+    name: "Lemon Herb Salmon & Green Bean Bowl",
+    cuisine: "American", time: 30, energy: ["moderate","energized"],
+    dietary: ["none","dairy-free","gluten-free","pescetarian","paleo","high-protein"],
+    key: ["salmon","green beans","rice","lemon","garlic","dill"],
+    nutrition: { cal:490, protein:"36g", carbs:"48g", fat:"14g", sugar:"5g", fiber:"5g" },
+    vibe: "Omega-rich and satisfying — put-together enough to feel like a win on a Wednesday.",
+    servings: "2 servings",
+    steps: ["Start rice (~25 min).","Pat salmon dry. Season with salt, pepper, garlic powder, dill.","Hot olive oil. Sear salmon skin-up 4 min. Flip 4–5 min until flaking.","Remove. Add green beans + splash water. Cover 3–4 min.","Squeeze lemon over everything."],
+    ingredients: ["2 salmon fillets (5–6 oz)","1 cup rice","2 cups green beans","½ lemon","1 tsp garlic powder","1 tsp dried dill","Olive oil, salt, pepper"],
+    tip: "Pat salmon completely dry before cooking — golden sear vs. sad steam.",
+    leftover: "Flake cold salmon over rice with olive oil and lemon — perfect 2-min lunch.",
+    grocery: { protein:[{name:"Salmon fillets — 2 (5–6 oz)",have:true}], produce:[{name:"Green beans — 2 cups",have:true},{name:"Lemon — 1",have:false}], grains:[{name:"Rice — 1 cup",have:true}], pantry:[{name:"Olive oil, dill, garlic powder, salt, pepper",have:false}], dairy:[], canned:[] }
+  },
+  {
+    name: "Japanese Miso Glazed Salmon Bowl",
+    cuisine: "Japanese", time: 25, energy: ["moderate"],
+    dietary: ["none","dairy-free","pescetarian","high-protein"],
+    key: ["salmon","rice","miso","soy sauce","ginger","garlic","cucumber","avocado","edamame"],
+    nutrition: { cal:520, protein:"38g", carbs:"50g", fat:"16g", sugar:"8g", fiber:"5g" },
+    vibe: "Japanese elegance made weeknight-simple — umami glaze, clean flavors, beautiful bowl.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Mix glaze: 2 tbsp miso paste + 1 tbsp soy sauce + 1 tbsp honey + 1 tsp sesame oil + 1 tsp ginger.","Spread glaze over salmon fillets.","Broil or pan-cook 4–5 min until caramelized and cooked through.","Build bowl: rice, salmon, sliced cucumber, avocado, edamame if you have it.","Drizzle with sesame oil and sesame seeds."],
+    ingredients: ["2 salmon fillets","1 cup rice","2 tbsp miso paste","1 tbsp soy sauce","1 tbsp honey","1 tsp sesame oil","1 tsp grated ginger","Cucumber, avocado, edamame for bowl","Sesame seeds"],
+    tip: "Watch the broiler — miso burns fast. Pull it the moment it caramelizes.",
+    leftover: "Cold miso salmon flaked over rice with avocado is one of the best next-day meals imaginable.",
+    grocery: { protein:[{name:"Salmon fillets — 2",have:true}], produce:[{name:"Cucumber — 1",have:false},{name:"Avocado — 1",have:false},{name:"Fresh ginger",have:false}], grains:[{name:"Rice — 1 cup",have:true}], pantry:[{name:"Miso paste — 2 tbsp",have:false},{name:"Soy sauce, honey, sesame oil",have:false},{name:"Sesame seeds",have:false}], dairy:[], canned:[{name:"Edamame (frozen, optional)",have:false}] }
+  },
+  {
+    name: "Tuna Poke Bowl",
+    cuisine: "Hawaiian", time: 15, energy: ["exhausted","moderate"],
+    dietary: ["none","dairy-free","gluten-free","pescetarian","high-protein"],
+    key: ["tuna","rice","soy sauce","avocado","cucumber","sesame oil","onion","mango"],
+    nutrition: { cal:480, protein:"34g", carbs:"52g", fat:"14g", sugar:"8g", fiber:"5g" },
+    vibe: "Hawaii in a bowl — fresh, bright, vibrant. No cooking required.",
+    servings: "2 servings",
+    steps: ["Cook rice and let cool slightly.","Cube sushi-grade tuna. Toss with soy sauce, sesame oil, green onion, sesame seeds.","Prepare your bowl toppings: sliced cucumber, avocado, mango, edamame.","Build bowls: rice base, tuna, all your toppings arranged on top.","Drizzle with extra soy sauce or sriracha mayo if you have it."],
+    ingredients: ["¾ lb sushi-grade tuna, cubed","1 cup rice","1 avocado, sliced","1 cucumber, sliced","½ mango, diced (optional)","2 tbsp soy sauce","1 tsp sesame oil","2 green onions, sliced","1 tsp sesame seeds","Optional: sriracha, mayo, edamame"],
+    tip: "Only use sushi-grade or sashimi-grade tuna for raw poke — ask your fishmonger specifically.",
+    leftover: "Eat immediately — the dressed tuna doesn't keep.",
+    grocery: { protein:[{name:"Sushi-grade tuna — ¾ lb",have:false}], produce:[{name:"Avocado — 1",have:false},{name:"Cucumber — 1",have:false},{name:"Mango — ½ (optional)",have:false},{name:"Green onions — 2",have:false}], grains:[{name:"Rice — 1 cup",have:false}], pantry:[{name:"Soy sauce, sesame oil, sesame seeds",have:false}], dairy:[], canned:[{name:"Edamame (optional)",have:false}] }
+  },
+  {
+    name: "Garlic Butter Tilapia or Cod",
+    cuisine: "American", time: 15, energy: ["exhausted"],
+    dietary: ["none","gluten-free","pescetarian","high-protein"],
+    key: ["white fish","tilapia","cod","halibut","butter","garlic","lemon","rice","green beans"],
+    nutrition: { cal:410, protein:"36g", carbs:"40g", fat:"14g", sugar:"2g", fiber:"3g" },
+    vibe: "The easiest elegant dinner you'll make — mild white fish with a buttery garlic pan sauce.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Pat fish dry. Season with salt, pepper, garlic powder, paprika.","Melt butter + olive oil in skillet over medium-high.","Cook fish 3–4 min per side until golden and flaking.","Add garlic to pan for 30 sec. Squeeze lemon over everything.","Serve over rice with steamed green beans."],
+    ingredients: ["2 tilapia or cod fillets","1 cup rice","2 cups green beans (optional)","1 tbsp butter","1 tbsp olive oil","3 garlic cloves, minced","1 lemon","½ tsp paprika","Salt, pepper"],
+    tip: "White fish cooks in minutes — 3–4 min per side is usually all it needs. It's done when it flakes with a fork.",
+    leftover: "Flake leftover fish into tacos with cabbage and lime tomorrow.",
+    grocery: { protein:[{name:"Tilapia or cod fillets — 2",have:false}], produce:[{name:"Garlic — 3 cloves",have:false},{name:"Lemon — 1",have:false},{name:"Green beans — 2 cups (optional)",have:false}], grains:[{name:"Rice — 1 cup",have:false}], pantry:[{name:"Olive oil, paprika, salt, pepper",have:false}], dairy:[{name:"Butter — 1 tbsp",have:false}], canned:[] }
+  },
+  {
+    name: "Cheesy Herb-Crusted Salmon Bowl",
+    cuisine: "American", time: 30, energy: ["moderate","energized"],
+    dietary: ["none","gluten-free","pescetarian","high-protein"],
+    key: ["salmon","cheese","yogurt","green beans","rice","dill","garlic"],
+    nutrition: { cal:555, protein:"44g", carbs:"33g", fat:"27g", sugar:"3g", fiber:"4g" },
+    vibe: "Same fridge, completely different dinner — feels a little fancy without asking extra.",
+    servings: "2 servings",
+    steps: ["Preheat oven to 400°F. Start rice.","Place salmon on lined baking sheet. Olive oil, salt, pepper, garlic powder.","Press cheese firmly over each fillet. Scatter green beans around, drizzle with oil.","Roast 14–16 min until cheese is golden.","Stir yogurt + dill + salt = sauce.","Bowl: rice, salmon, green beans, yogurt sauce drizzled over."],
+    ingredients: ["2 salmon fillets","2 tbsp shredded cheese","3 tbsp plain yogurt","1 cup rice","2 cups green beans","1 tsp dill","1 tsp garlic powder","Olive oil, salt, pepper"],
+    tip: "Press cheese firmly — it needs to stick to crust properly in the oven.",
+    leftover: "Flake cold salmon over rice with a spoon of yogurt sauce — lunch in 2 minutes.",
+    grocery: { protein:[{name:"Salmon fillets — 2",have:true}], produce:[{name:"Green beans — 2 cups",have:true},{name:"Lemon (optional)",have:false}], grains:[{name:"Rice — 1 cup",have:true}], pantry:[{name:"Olive oil, garlic powder, dill, salt, pepper",have:false}], dairy:[{name:"Shredded cheese — 2 tbsp",have:true},{name:"Plain yogurt — 3 tbsp",have:true}], canned:[] }
+  },
+
+  /* ═══════════════════════════════════════════
+     SHRIMP
+  ═══════════════════════════════════════════ */
+  {
+    name: "Garlic Butter Shrimp & Rice",
+    cuisine: "American", time: 15, energy: ["exhausted","moderate"],
+    dietary: ["none","gluten-free","pescetarian","high-protein"],
+    key: ["shrimp","rice","garlic","butter","lemon","spinach","parsley"],
+    nutrition: { cal:430, protein:"34g", carbs:"48g", fat:"12g", sugar:"2g", fiber:"2g" },
+    vibe: "Feels indulgent, costs almost no effort — done before you even realize it.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Pat shrimp dry. Season with salt, pepper, garlic powder.","Heat butter + olive oil over medium-high.","Shrimp in single layer. 2 min per side until pink. Do not overcrowd.","Add garlic 30 sec. Squeeze lemon. Toss in spinach if using.","Serve over rice."],
+    ingredients: ["¾ lb shrimp, peeled & deveined","1 cup rice","3 garlic cloves","1 tbsp butter","1 tbsp olive oil","½ lemon","2 cups spinach (optional)","Salt, pepper"],
+    tip: "The moment shrimp curls into a C, it's done. An O shape means overcooked and rubbery.",
+    leftover: "Chop cold shrimp, toss with rice, olive oil, lemon — 2-min next-day lunch.",
+    grocery: { protein:[{name:"Shrimp — ¾ lb, peeled & deveined",have:false}], produce:[{name:"Garlic — 3 cloves",have:false},{name:"Lemon — 1",have:false},{name:"Spinach (optional)",have:false}], grains:[{name:"Rice — 1 cup",have:false}], pantry:[{name:"Olive oil, salt, pepper",have:false}], dairy:[{name:"Butter — 1 tbsp",have:false}], canned:[] }
+  },
+  {
+    name: "Shrimp Pad Thai",
+    cuisine: "Thai", time: 25, energy: ["moderate","energized"],
+    dietary: ["none","dairy-free","pescetarian","high-protein"],
+    key: ["shrimp","noodles","pasta","eggs","soy sauce","lime","peanuts","bean sprouts","garlic","onion"],
+    nutrition: { cal:520, protein:"32g", carbs:"62g", fat:"16g", sugar:"9g", fiber:"3g" },
+    vibe: "Thailand's most famous noodle dish — tangy, sweet, savory, and deeply satisfying.",
+    servings: "2 servings",
+    steps: ["Soak rice noodles in warm water 20 min (or boil pasta 2 min under al dente).","Make sauce: 2 tbsp soy sauce or fish sauce, 1 tbsp lime juice, 1 tbsp sugar, 1 tbsp sriracha.","High heat oil. Cook shrimp 2 min. Set aside.","Add garlic and onion. 1 min. Push to side, scramble eggs in pan.","Add noodles + sauce. Toss 2 min.","Return shrimp. Serve with lime, peanuts, bean sprouts."],
+    ingredients: ["¾ lb shrimp","6 oz rice noodles or pasta","2 eggs","3 garlic cloves","½ onion","2 tbsp soy sauce or fish sauce","1 tbsp lime juice","1 tbsp sugar","1 tbsp sriracha","Peanuts, bean sprouts, lime wedges (garnish)","Oil"],
+    tip: "High heat the entire time — pad thai dies on low heat. Keep it moving and keep it hot.",
+    leftover: "Doesn't keep well — best eaten right away. Make just enough.",
+    grocery: { protein:[{name:"Shrimp — ¾ lb",have:false}], produce:[{name:"Garlic — 3 cloves",have:false},{name:"Onion — ½",have:false},{name:"Lime — 1",have:false},{name:"Bean sprouts (optional)",have:false}], grains:[{name:"Rice noodles or pasta — 6 oz",have:false}], pantry:[{name:"Soy sauce or fish sauce, sugar, sriracha",have:false},{name:"Peanuts (optional)",have:false},{name:"Oil",have:false}], dairy:[], canned:[] }
+  },
+  {
+    name: "Cuban Mojo Shrimp Bowl",
+    cuisine: "Cuban", time: 20, energy: ["exhausted","moderate"],
+    dietary: ["none","dairy-free","gluten-free","pescetarian","high-protein"],
+    key: ["shrimp","rice","garlic","lime","orange","cilantro","onion","bell pepper","avocado"],
+    nutrition: { cal:445, protein:"32g", carbs:"50g", fat:"12g", sugar:"7g", fiber:"4g" },
+    vibe: "Cuban citrus-garlic magic — bright, punchy, and ready in 20 minutes flat.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Make mojo marinade: juice of 1 orange + 2 limes, 4 garlic cloves, 1 tsp cumin, oregano, salt, olive oil.","Toss shrimp in half the mojo. Marinate 10 min.","High heat skillet. Cook shrimp 2 min per side.","Sauté bell pepper and onion in same pan 2–3 min.","Bowl: rice, shrimp, veggies. Drizzle remaining mojo over top. Top with avocado."],
+    ingredients: ["¾ lb shrimp","1 cup rice","1 orange, juiced","2 limes, juiced","4 garlic cloves","1 bell pepper","½ onion","1 avocado","1 tsp cumin, oregano","Olive oil, salt, cilantro"],
+    tip: "The leftover mojo is incredible as a salad dressing — make extra.",
+    leftover: "Shrimp doesn't keep well, but the rice and mojo sauce reheat fine.",
+    grocery: { protein:[{name:"Shrimp — ¾ lb",have:false}], produce:[{name:"Orange — 1",have:false},{name:"Limes — 2",have:false},{name:"Garlic — 4 cloves",have:false},{name:"Bell pepper — 1",have:false},{name:"Onion — ½",have:false},{name:"Avocado — 1",have:false},{name:"Cilantro",have:false}], grains:[{name:"Rice — 1 cup",have:false}], pantry:[{name:"Olive oil, cumin, oregano, salt",have:false}], dairy:[], canned:[] }
+  },
+
+  /* ═══════════════════════════════════════════
+     EGGS
+  ═══════════════════════════════════════════ */
+  {
+    name: "Classic Veggie Omelette",
+    cuisine: "French-American", time: 15, energy: ["exhausted"],
+    dietary: ["none","vegetarian","gluten-free","keto","low-carb","high-protein"],
+    key: ["eggs","spinach","bell pepper","cheese","tomato","mushrooms","onion","zucchini"],
+    nutrition: { cal:310, protein:"22g", carbs:"8g", fat:"21g", sugar:"4g", fiber:"2g" },
+    vibe: "Breakfast for dinner — the smartest, most effortless decision you'll make all week.",
+    servings: "1 serving",
+    steps: ["Whisk 3 eggs with salt and pepper.","Butter or oil in non-stick pan over medium.","Add vegetables. Cook 2 min.","Pour eggs over. Let set 30 sec, push edges to center.","Add cheese to one half. Fold. Cook 1 more min.","Slide onto plate."],
+    ingredients: ["3 eggs","Any vegetables: spinach, bell pepper, tomato, mushrooms","2 tbsp shredded cheese","1 tbsp butter","Salt, pepper"],
+    tip: "Medium heat only — high heat makes eggs rubbery. Patience wins here.",
+    leftover: "Best fresh — make a second one tomorrow.",
+    grocery: { protein:[{name:"Eggs — 3",have:true}], produce:[{name:"Bell pepper, spinach, tomato — whatever you have",have:true}], grains:[], pantry:[{name:"Butter or oil, salt, pepper",have:false}], dairy:[{name:"Shredded cheese — 2 tbsp",have:false}], canned:[] }
+  },
+  {
+    name: "Quick Egg Fried Rice",
+    cuisine: "Asian", time: 15, energy: ["exhausted"],
+    dietary: ["none","vegetarian","dairy-free","gluten-free"],
+    key: ["eggs","rice","soy sauce","garlic","onion","peas","corn","carrot","broccoli"],
+    nutrition: { cal:380, protein:"15g", carbs:"52g", fat:"12g", sugar:"3g", fiber:"3g" },
+    vibe: "The ultimate weeknight rescue — uses what you have, faster than takeout.",
+    servings: "2 servings",
+    steps: ["Best with day-old rice. Otherwise cook and cool.","High heat + oil.","Garlic and onion 1 min. Push to side — scramble eggs.","Add rice, vegetables, soy sauce. Toss 2–3 min.","Season to taste. Top with sesame oil."],
+    ingredients: ["2 cups cooked rice","3 eggs","½ cup peas, corn, or diced carrot","2 garlic cloves","½ onion, diced","2 tbsp soy sauce","Sesame oil, vegetable oil","Salt, pepper"],
+    tip: "High heat and minimal stirring = crispy rice. That's the whole secret.",
+    leftover: "Reheat in hot pan, add fried egg on top.",
+    grocery: { protein:[{name:"Eggs — 3",have:true}], produce:[{name:"Garlic — 2 cloves",have:false},{name:"Onion — ½",have:false}], grains:[{name:"Cooked rice — 2 cups",have:true}], pantry:[{name:"Soy sauce, sesame oil, vegetable oil",have:false}], dairy:[], canned:[{name:"Frozen peas or corn — ½ cup",have:false}] }
+  },
+  {
+    name: "Shakshuka",
+    cuisine: "Middle Eastern / North African", time: 25, energy: ["exhausted","moderate"],
+    dietary: ["none","vegetarian","gluten-free","dairy-free"],
+    key: ["eggs","tomato","bell pepper","onion","garlic","spinach","feta","cheese","bread"],
+    nutrition: { cal:340, protein:"18g", carbs:"28g", fat:"17g", sugar:"12g", fiber:"6g" },
+    vibe: "One pan, pantry ingredients, big flavors — North Africa's most beloved egg dish.",
+    servings: "2 servings",
+    steps: ["Heat olive oil in skillet. Sauté onion and bell pepper 4–5 min.","Add garlic, cumin, paprika, cayenne. Cook 1 min.","Add tomatoes (canned or fresh diced). Simmer 8–10 min.","Taste and season. Make 4 wells in the sauce.","Crack an egg into each well. Cover. Cook 5–7 min until whites set, yolks still runny.","Top with feta if you have it. Serve with crusty bread."],
+    ingredients: ["4 eggs","1 can diced tomatoes (or 3 fresh tomatoes)","1 bell pepper, diced","1 onion, diced","3 garlic cloves","1 tsp cumin","1 tsp paprika","Pinch cayenne","Feta cheese (optional)","Fresh parsley (optional)","Olive oil, salt, pepper","Crusty bread for serving"],
+    tip: "Cover the pan when the eggs go in — that's how you set the whites while keeping the yolks runny.",
+    leftover: "Shakshuka is best fresh — eggs continue cooking even off heat.",
+    grocery: { protein:[{name:"Eggs — 4",have:true}], produce:[{name:"Bell pepper — 1",have:true},{name:"Onion — 1",have:false},{name:"Garlic — 3 cloves",have:false},{name:"Parsley (optional)",have:false}], grains:[{name:"Crusty bread for serving",have:false}], pantry:[{name:"Olive oil, cumin, paprika, cayenne, salt",have:false}], dairy:[{name:"Feta cheese (optional)",have:false}], canned:[{name:"Diced tomatoes — 1 can",have:false}] }
+  },
+  {
+    name: "Huevos Rancheros",
+    cuisine: "Mexican", time: 20, energy: ["exhausted"],
+    dietary: ["none","vegetarian","gluten-free"],
+    key: ["eggs","tomato","onion","garlic","bell pepper","beans","cheese","avocado","bread","tortilla"],
+    nutrition: { cal:420, protein:"20g", carbs:"38g", fat:"20g", sugar:"6g", fiber:"8g" },
+    vibe: "Mexican ranch-style eggs — bold, hearty, and deeply satisfying any time of day.",
+    servings: "2 servings",
+    steps: ["Make ranchero sauce: sauté onion 3 min, add garlic, tomatoes, jalapeño if you have it. Simmer 5 min. Season with cumin, salt.","Warm tortillas or toast bread.","Fry eggs in olive oil to your liking.","Plate: tortilla/toast, beans, eggs, ranchero sauce poured over.","Top with avocado, cheese, cilantro."],
+    ingredients: ["4 eggs","2 corn tortillas or toast","2 tomatoes, diced","½ onion, diced","2 garlic cloves","1 can black beans, drained","1 avocado","½ tsp cumin","Shredded cheese, cilantro (optional)","Olive oil, salt, pepper"],
+    tip: "The sauce is everything — don't rush it. Let the tomatoes really break down and concentrate.",
+    leftover: "Make extra ranchero sauce and freeze it — it's incredible on everything.",
+    grocery: { protein:[{name:"Eggs — 4",have:true}], produce:[{name:"Tomatoes — 2",have:true},{name:"Onion — ½",have:false},{name:"Garlic — 2 cloves",have:false},{name:"Avocado — 1",have:false},{name:"Cilantro (optional)",have:false}], grains:[{name:"Corn tortillas or bread",have:false}], pantry:[{name:"Olive oil, cumin, salt, pepper",have:false}], dairy:[{name:"Shredded cheese (optional)",have:false}], canned:[{name:"Black beans — 1 can",have:false}] }
+  },
+
+  /* ═══════════════════════════════════════════
+     VEGETARIAN / VEGAN / PLANT-BASED
+  ═══════════════════════════════════════════ */
+  {
+    name: "Mediterranean Chickpea Bowl",
+    cuisine: "Mediterranean", time: 20, energy: ["exhausted","moderate"],
+    dietary: ["vegetarian","vegan","gluten-free","dairy-free","high-protein"],
+    key: ["chickpeas","cucumber","tomato","rice","spinach","bell pepper","feta","lemon"],
+    nutrition: { cal:420, protein:"16g", carbs:"65g", fat:"11g", sugar:"8g", fiber:"12g" },
+    vibe: "Light, fresh, plant-powered — no cooking stress, just assembly and flavor.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Drain and rinse chickpeas. Toss with olive oil, cumin, paprika, salt.","Pan-fry chickpeas 5–6 min until slightly crispy.","Dice all fresh vegetables.","Build bowl: rice, crispy chickpeas, all the veggies.","Drizzle with olive oil and lemon. Add feta if using."],
+    ingredients: ["1 can chickpeas","1 cup rice","1 cucumber","2 tomatoes","1 bell pepper","2 cups spinach","1 lemon","Olive oil, cumin, paprika, salt","Feta (optional)"],
+    tip: "Don't stir chickpeas constantly — let them sit 2–3 min between stirs to get crispy.",
+    leftover: "Store everything separately — assembles into a fresh bowl next day in minutes.",
+    grocery: { protein:[], produce:[{name:"Cucumber — 1",have:true},{name:"Tomatoes — 2",have:true},{name:"Bell pepper — 1",have:true},{name:"Spinach — 2 cups",have:true},{name:"Lemon — 1",have:false}], grains:[{name:"Rice — 1 cup",have:true}], pantry:[{name:"Olive oil, cumin, paprika, salt",have:false}], dairy:[{name:"Feta cheese (optional)",have:false}], canned:[{name:"Chickpeas — 1 can",have:false}] }
+  },
+  {
+    name: "Red Lentil Dal with Rice",
+    cuisine: "Indian", time: 30, energy: ["moderate"],
+    dietary: ["vegetarian","vegan","gluten-free","dairy-free","high-protein"],
+    key: ["lentils","tomato","onion","garlic","ginger","rice","spinach","coconut milk"],
+    nutrition: { cal:440, protein:"20g", carbs:"72g", fat:"8g", sugar:"6g", fiber:"14g" },
+    vibe: "India's ultimate comfort food — warming, earthy, nourishing, and impossibly easy.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Sauté onion in oil 5 min. Add garlic, ginger, cumin, turmeric, coriander, garam masala. Cook 1 min.","Add lentils, tomatoes, 2 cups water or broth. Bring to boil.","Simmer 20 min until lentils break down and thicken.","Stir in spinach. Season with salt and lemon.","Serve over rice with a drizzle of coconut milk if you have it."],
+    ingredients: ["1 cup red lentils","1 cup rice","2 tomatoes or 1 can diced","1 onion","3 garlic cloves","1 tsp fresh ginger","1 tsp cumin, turmeric, coriander","½ tsp garam masala","2 cups spinach","1 lemon","Oil, salt"],
+    tip: "Red lentils dissolve into the sauce naturally — you don't need to blend anything.",
+    leftover: "Dal thickens as it sits — add a splash of water when reheating.",
+    grocery: { protein:[], produce:[{name:"Onion — 1",have:false},{name:"Garlic — 3 cloves",have:false},{name:"Tomatoes — 2",have:false},{name:"Spinach — 2 cups",have:false},{name:"Lemon — 1",have:false}], grains:[{name:"Red lentils — 1 cup",have:false},{name:"Rice — 1 cup",have:false}], pantry:[{name:"Oil, cumin, turmeric, coriander, garam masala, salt",have:false}], dairy:[], canned:[{name:"Diced tomatoes — 1 can (alternative)",have:false}] }
+  },
+  {
+    name: "Black Bean & Sweet Potato Rice Bowl",
+    cuisine: "Mexican-American", time: 35, energy: ["moderate"],
+    dietary: ["vegetarian","vegan","gluten-free","dairy-free","high-protein"],
+    key: ["black beans","sweet potato","rice","avocado","lime","corn","bell pepper","onion"],
+    nutrition: { cal:460, protein:"14g", carbs:"82g", fat:"9g", sugar:"10g", fiber:"16g" },
+    vibe: "Colorful, hearty, and plant-powered — proof that vegan food can be deeply satisfying.",
+    servings: "2 servings",
+    steps: ["Preheat oven to 425°F. Cube sweet potato, toss with olive oil, cumin, salt. Roast 25 min.","Cook rice.","Warm black beans in a pan with garlic, cumin, salt. Mash slightly if you like.","Build bowl: rice, beans, roasted sweet potato, corn, avocado.","Squeeze lime over everything. Add salsa if you have it."],
+    ingredients: ["1 can black beans","1 large sweet potato, cubed","1 cup rice","1 avocado","½ cup corn","1 lime","1 tsp cumin, garlic powder","Olive oil, salt"],
+    tip: "Roast the sweet potato until the edges caramelize — that browning adds a sweetness you can't get from steaming.",
+    leftover: "All components store separately for 3 days — easy meal prep.",
+    grocery: { protein:[], produce:[{name:"Sweet potato — 1 large",have:false},{name:"Avocado — 1",have:false},{name:"Lime — 1",have:false}], grains:[{name:"Rice — 1 cup",have:false}], pantry:[{name:"Olive oil, cumin, garlic powder, salt",have:false}], dairy:[], canned:[{name:"Black beans — 1 can",have:false},{name:"Corn — ½ cup",have:false}] }
+  },
+  {
+    name: "Crispy Tofu Stir Fry",
+    cuisine: "Asian", time: 25, energy: ["moderate"],
+    dietary: ["vegetarian","vegan","dairy-free","high-protein"],
+    key: ["tofu","broccoli","bell pepper","soy sauce","garlic","ginger","rice","mushrooms","bok choy","cabbage","zucchini","carrot"],
+    nutrition: { cal:390, protein:"22g", carbs:"48g", fat:"13g", sugar:"8g", fiber:"5g" },
+    vibe: "Crispy outside, tender inside — this is the tofu that converts tofu skeptics.",
+    servings: "2 servings",
+    steps: ["Press tofu 15 min with paper towels. Cut into cubes.","Cook rice.","Toss tofu in cornstarch, salt, pepper. Pan-fry in oil until golden all sides — don't rush, 5–7 min total.","Remove. Add vegetables + garlic + ginger. Stir fry 3–4 min.","Sauce: 3 tbsp soy sauce, 1 tbsp sesame oil, 1 tbsp honey or maple.","Return tofu, pour sauce, toss. Serve over rice."],
+    ingredients: ["1 block firm tofu","1 cup rice","2 cups mixed vegetables","3 garlic cloves","1 tsp ginger","3 tbsp soy sauce","1 tbsp sesame oil","1 tbsp honey or maple syrup","1 tbsp cornstarch","Vegetable oil"],
+    tip: "Pressing the tofu and using cornstarch are non-negotiable for crispy results. Skip either and you get mush.",
+    leftover: "Reheat tofu in a dry pan — never microwave if you want to keep the texture.",
+    grocery: { protein:[{name:"Firm tofu — 1 block",have:false}], produce:[{name:"Mixed vegetables — 2 cups",have:false},{name:"Garlic — 3 cloves",have:false},{name:"Ginger",have:false}], grains:[{name:"Rice — 1 cup",have:false}], pantry:[{name:"Soy sauce, sesame oil, honey, cornstarch",have:false},{name:"Vegetable oil",have:false}], dairy:[], canned:[] }
+  },
+  {
+    name: "White Bean & Kale Skillet",
+    cuisine: "Italian", time: 20, energy: ["exhausted","moderate"],
+    dietary: ["vegetarian","vegan","gluten-free","dairy-free","high-protein"],
+    key: ["beans","kale","spinach","garlic","tomato","lemon","bread","pasta","onion"],
+    nutrition: { cal:350, protein:"18g", carbs:"52g", fat:"9g", sugar:"5g", fiber:"14g" },
+    vibe: "Tuscan-inspired simplicity — hearty, satisfying, and on the table in 20 minutes.",
+    servings: "2 servings",
+    steps: ["Heat olive oil over medium. Add garlic and chili flakes. 1 min.","Add kale or spinach. Cook until wilted — 3–4 min.","Add white beans. Stir and cook 3 min.","Add tomatoes, lemon juice, broth or water. Simmer 5 min.","Season generously. Serve with crusty bread or over pasta."],
+    ingredients: ["1 can white beans (cannellini)","3 cups kale or spinach","3 garlic cloves","2 tomatoes or ½ can","1 lemon","½ cup vegetable broth or water","Chili flakes","Olive oil, salt, pepper","Bread or pasta to serve"],
+    tip: "Mash a few of the beans against the pan — it thickens the sauce without any extra work.",
+    leftover: "Even better the next day — the beans absorb all the flavors overnight.",
+    grocery: { protein:[], produce:[{name:"Kale or spinach — 3 cups",have:false},{name:"Garlic — 3 cloves",have:false},{name:"Tomatoes — 2",have:false},{name:"Lemon — 1",have:false}], grains:[{name:"Crusty bread or pasta",have:false}], pantry:[{name:"Olive oil, chili flakes, salt, pepper",have:false}], dairy:[], canned:[{name:"White beans (cannellini) — 1 can",have:false}] }
+  },
+  {
+    name: "Pasta Primavera",
+    cuisine: "Italian-American", time: 25, energy: ["moderate"],
+    dietary: ["vegetarian","high-protein"],
+    key: ["pasta","zucchini","bell pepper","broccoli","asparagus","peas","tomato","garlic","cheese","cream","butter"],
+    nutrition: { cal:490, protein:"18g", carbs:"68g", fat:"16g", sugar:"9g", fiber:"7g" },
+    vibe: "Spring in a bowl — fresh vegetables, light cream sauce, no-fuss weeknight elegance.",
+    servings: "2 servings",
+    steps: ["Cook pasta al dente. Reserve 1 cup pasta water.","Sauté garlic in butter and olive oil 1 min.","Add any vegetables: zucchini, bell pepper, asparagus, broccoli. Cook 4–5 min.","Add cherry tomatoes and peas. Cook 2 min.","Toss in pasta, splash of cream and pasta water. Stir to emulsify.","Top generously with parmesan."],
+    ingredients: ["6 oz pasta (penne or farfalle)","2–3 cups mixed vegetables","3 garlic cloves","2 tbsp butter","1 tbsp olive oil","¼ cup cream or milk","½ cup parmesan, grated","Salt, pepper, fresh basil (optional)"],
+    tip: "Reserve pasta water before draining — the starch is liquid gold that makes the sauce silky.",
+    leftover: "Add a splash of water and reheat gently — pasta firms up overnight.",
+    grocery: { protein:[], produce:[{name:"Mixed vegetables — 2 cups",have:false},{name:"Garlic — 3 cloves",have:false},{name:"Fresh basil (optional)",have:false}], grains:[{name:"Pasta — 6 oz",have:false}], pantry:[{name:"Olive oil, salt, pepper",have:false}], dairy:[{name:"Butter — 2 tbsp",have:false},{name:"Cream or milk — ¼ cup",have:false},{name:"Parmesan — ½ cup",have:false}], canned:[] }
+  },
+  {
+    name: "Tomato Basil Pasta",
+    cuisine: "Italian", time: 20, energy: ["exhausted"],
+    dietary: ["vegetarian","vegan","dairy-free","high-protein"],
+    key: ["pasta","tomato","garlic","basil","onion","cheese","olive oil"],
+    nutrition: { cal:420, protein:"13g", carbs:"68g", fat:"11g", sugar:"8g", fiber:"5g" },
+    vibe: "The eternal Italian classic — proof that the best meals have almost nothing in them.",
+    servings: "2 servings",
+    steps: ["Cook pasta. Reserve pasta water.","Sauté garlic in plenty of olive oil — 2 min, don't brown.","Add tomatoes (fresh or canned). Simmer 10 min.","Add a big pinch of sugar to balance acidity.","Toss pasta with sauce and pasta water until silky.","Top with fresh basil and parmesan."],
+    ingredients: ["6 oz pasta (spaghetti or linguine)","3 tomatoes or 1 can crushed tomatoes","4 garlic cloves","Fresh basil","Pinch of sugar","Olive oil, salt, pepper","Parmesan (optional but recommended)"],
+    tip: "Use more olive oil than you think — it's the soul of this sauce.",
+    leftover: "Keep sauce and pasta separate — reheat sauce and cook fresh pasta if possible.",
+    grocery: { protein:[], produce:[{name:"Tomatoes — 3",have:false},{name:"Garlic — 4 cloves",have:false},{name:"Fresh basil",have:false}], grains:[{name:"Pasta — 6 oz",have:false}], pantry:[{name:"Olive oil, sugar, salt, pepper",have:false}], dairy:[{name:"Parmesan (optional)",have:false}], canned:[{name:"Crushed tomatoes — 1 can (alternative)",have:false}] }
+  },
+  {
+    name: "Mac & Cheese with Broccoli",
+    cuisine: "American", time: 25, energy: ["exhausted"],
+    dietary: ["vegetarian","high-protein"],
+    key: ["pasta","cheese","milk","butter","broccoli","flour","onion"],
+    nutrition: { cal:530, protein:"22g", carbs:"62g", fat:"22g", sugar:"7g", fiber:"4g" },
+    vibe: "Elevated comfort — the mac and cheese you grew up with, but better and with vegetables.",
+    servings: "2 servings",
+    steps: ["Cook pasta al dente. Steam or blanch broccoli florets.","Make cheese sauce: melt butter, whisk in flour, cook 1 min. Slowly whisk in milk. Stir constantly until thick.","Off heat, stir in shredded cheese until melted. Season with salt, pepper, mustard powder.","Combine pasta, broccoli, and cheese sauce. Toss well.","Serve immediately — mac waits for no one."],
+    ingredients: ["6 oz pasta (elbows or penne)","2 cups broccoli florets","2 tbsp butter","2 tbsp flour","1½ cups milk","1½ cups shredded cheddar or cheese of choice","½ tsp mustard powder","Salt, pepper"],
+    tip: "Mustard powder is the secret ingredient — it amplifies the cheese flavor without tasting like mustard.",
+    leftover: "Reheat with a splash of milk to restore creaminess.",
+    grocery: { protein:[], produce:[{name:"Broccoli — 2 cups",have:false}], grains:[{name:"Pasta — 6 oz",have:false}], pantry:[{name:"Flour — 2 tbsp",have:false},{name:"Mustard powder, salt, pepper",have:false}], dairy:[{name:"Butter — 2 tbsp",have:false},{name:"Milk — 1½ cups",have:false},{name:"Shredded cheddar — 1½ cups",have:false}], canned:[] }
+  },
+  {
+    name: "Vegetable Minestrone Soup",
+    cuisine: "Italian", time: 35, energy: ["moderate"],
+    dietary: ["vegetarian","vegan","dairy-free","gluten-free","high-protein"],
+    key: ["tomato","zucchini","carrot","celery","onion","garlic","beans","pasta","kale","spinach","broccoli"],
+    nutrition: { cal:320, protein:"14g", carbs:"52g", fat:"7g", sugar:"10g", fiber:"12g" },
+    vibe: "Italy's original everything-in-the-fridge soup — nourishing, flexible, and endlessly forgiving.",
+    servings: "4 servings",
+    steps: ["Sauté onion, carrot, celery in olive oil 5 min.","Add garlic, zucchini, any other vegetables. Cook 3 min.","Add canned tomatoes, 4 cups broth or water, beans, Italian seasoning. Bring to boil.","Simmer 15 min.","Add pasta or kale/spinach last 10 min.","Season generously. Top with parmesan if not vegan."],
+    ingredients: ["1 can white beans or kidney beans","1 can diced tomatoes","1 zucchini, diced","2 carrots, diced","2 celery stalks","1 onion","3 garlic cloves","2 cups kale or spinach","½ cup small pasta (optional)","4 cups vegetable broth","1 tsp Italian seasoning","Olive oil, salt, pepper, parmesan"],
+    tip: "Minestrone is meant to be thick — add less broth if you want it stewlike, more if you want it soupy.",
+    leftover: "Gets better every day. Makes excellent lunch for the whole week.",
+    grocery: { protein:[], produce:[{name:"Zucchini — 1",have:false},{name:"Carrots — 2",have:false},{name:"Celery — 2 stalks",have:false},{name:"Onion — 1",have:false},{name:"Garlic — 3 cloves",have:false},{name:"Kale or spinach — 2 cups",have:false}], grains:[{name:"Small pasta — ½ cup (optional)",have:false}], pantry:[{name:"Olive oil, Italian seasoning, salt, pepper",have:false}], dairy:[{name:"Parmesan (optional)",have:false}], canned:[{name:"White beans — 1 can",have:false},{name:"Diced tomatoes — 1 can",have:false}] }
+  },
+
+  /* ═══════════════════════════════════════════
+     FRUIT & DAIRY FEATURED
+  ═══════════════════════════════════════════ */
+  {
+    name: "Berry Yogurt Parfait Power Bowl",
+    cuisine: "American", time: 10, energy: ["exhausted"],
+    dietary: ["vegetarian","gluten-free","high-protein"],
+    key: ["yogurt","strawberries","blueberries","berries","banana","oats","honey","granola"],
+    nutrition: { cal:380, protein:"18g", carbs:"58g", fat:"8g", sugar:"28g", fiber:"6g" },
+    vibe: "No-cook, no-stress, actually nourishing — the dinner that doubles as self-care.",
+    servings: "1 serving",
+    steps: ["Spoon yogurt into a bowl.","Layer with fresh or frozen berries and sliced banana.","Top with oats or granola.","Drizzle with honey.","That's it. You're done."],
+    ingredients: ["1 cup plain or vanilla yogurt","1 cup mixed berries (fresh or frozen)","1 banana, sliced","¼ cup oats or granola","1 tbsp honey or maple syrup"],
+    tip: "Use Greek yogurt for more protein and a thicker, creamier base.",
+    leftover: "Make it fresh each time — granola goes soggy if assembled overnight.",
+    grocery: { protein:[], produce:[{name:"Mixed berries — 1 cup",have:false},{name:"Banana — 1",have:false}], grains:[{name:"Oats or granola — ¼ cup",have:false}], pantry:[{name:"Honey or maple syrup",have:false}], dairy:[{name:"Yogurt — 1 cup",have:false}], canned:[] }
+  },
+  {
+    name: "Strawberry Banana Oat Pancakes",
+    cuisine: "American", time: 20, energy: ["moderate","exhausted"],
+    dietary: ["vegetarian","dairy-free","gluten-free","high-protein"],
+    key: ["banana","oats","eggs","strawberries","blueberries","berries","yogurt","milk"],
+    nutrition: { cal:350, protein:"14g", carbs:"52g", fat:"9g", sugar:"18g", fiber:"6g" },
+    vibe: "Three-ingredient magic — naturally sweet, protein-packed, and requires zero culinary skill.",
+    servings: "2 servings",
+    steps: ["Blend 2 ripe bananas + 2 eggs + ½ cup oats until smooth. Add a pinch of salt.","Optional: add 1 tsp vanilla, cinnamon.","Heat non-stick pan over medium. Spoon batter to form small pancakes.","Cook 2–3 min per side until set.","Serve with sliced strawberries and a drizzle of honey or yogurt."],
+    ingredients: ["2 ripe bananas","2 eggs","½ cup oats","Pinch of salt, cinnamon, vanilla","Strawberries or berries for topping","Honey or yogurt for serving"],
+    tip: "The riper the banana, the sweeter and easier to blend — those spotty black ones are perfect for this.",
+    leftover: "Stack and refrigerate. Reheat in the toaster — they pop right back to life.",
+    grocery: { protein:[], produce:[{name:"Bananas — 2 ripe",have:false},{name:"Strawberries for topping",have:false}], grains:[{name:"Oats — ½ cup",have:false}], pantry:[{name:"Salt, cinnamon, vanilla, honey",have:false}], dairy:[{name:"Yogurt for serving (optional)",have:false}], canned:[] }
+  },
+  {
+    name: "Mango Coconut Chia Pudding",
+    cuisine: "Caribbean/Asian", time: 10, energy: ["exhausted"],
+    dietary: ["vegetarian","vegan","gluten-free","dairy-free"],
+    key: ["mango","coconut milk","yogurt","berries","banana","oats","honey"],
+    nutrition: { cal:310, protein:"8g", carbs:"42g", fat:"12g", sugar:"22g", fiber:"8g" },
+    vibe: "Tropical and creamy with zero cooking — make it tonight, wake up to breakfast tomorrow.",
+    servings: "2 servings",
+    steps: ["Mix: 1 cup coconut milk + ¼ cup chia seeds + 1 tbsp honey + pinch of salt.","Stir well. Let sit 5 min. Stir again to prevent clumping.","Refrigerate overnight (or 2+ hours).","When ready: top with diced mango, shredded coconut, and any other fruit."],
+    ingredients: ["¼ cup chia seeds","1 cup coconut milk","1 mango, diced","1 tbsp honey or maple syrup","Pinch of salt","Shredded coconut, extra fruit for topping"],
+    tip: "Stir twice in the first 10 minutes — that's how you prevent lumps from forming.",
+    leftover: "Keeps in fridge up to 4 days — perfect grab-and-go.",
+    grocery: { protein:[], produce:[{name:"Mango — 1",have:false}], grains:[{name:"Chia seeds — ¼ cup",have:false}], pantry:[{name:"Honey or maple syrup",have:false},{name:"Shredded coconut (optional)",have:false}], dairy:[], canned:[{name:"Coconut milk — 1 cup",have:false}] }
+  },
+  {
+    name: "Teriyaki Chicken Rice Bowl",
+    cuisine: "Japanese", time: 25, energy: ["exhausted","moderate"],
+    dietary: ["none","dairy-free","high-protein"],
+    key: ["chicken","rice","soy sauce","garlic","ginger","honey","broccoli","carrot"],
+    nutrition: { cal:520, protein:"40g", carbs:"56g", fat:"12g", sugar:"15g", fiber:"3g" },
+    vibe: "Glossy, sweet-savory, and crave-worthy — Japanese comfort food made simple.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Sauce: 4 tbsp soy sauce, 2 tbsp honey, 1 tsp ginger, 2 garlic cloves, 1 tsp cornstarch + water.","Cook diced chicken in oil 6 min until golden.","Pour sauce over, simmer 2 min until glossy and thick.","Steam broccoli alongside.","Serve over rice with sesame seeds."],
+    ingredients: ["2 chicken breasts, diced","1 cup rice","4 tbsp soy sauce","2 tbsp honey","2 garlic cloves","1 tsp ginger","1 tsp cornstarch","Broccoli","Sesame seeds, oil"],
+    tip: "Let the sauce reduce until it coats the back of a spoon — that's the teriyaki gloss.",
+    leftover: "Reheats beautifully — the flavors deepen overnight.",
+    grocery: { protein:[{name:"Chicken breasts — 2",have:true}], produce:[{name:"Broccoli",have:false},{name:"Garlic — 2 cloves",have:false},{name:"Ginger",have:false}], grains:[{name:"Rice — 1 cup",have:true}], pantry:[{name:"Soy sauce, honey, cornstarch, sesame seeds, oil",have:false}], dairy:[], canned:[] }
+  },
+  {
+    name: "Vietnamese Lemongrass Chicken Bowl",
+    cuisine: "Vietnamese", time: 25, energy: ["moderate"],
+    dietary: ["none","dairy-free","gluten-free","high-protein"],
+    key: ["chicken","rice","lime","garlic","cucumber","carrot","onion","peanuts"],
+    nutrition: { cal:490, protein:"38g", carbs:"52g", fat:"13g", sugar:"8g", fiber:"4g" },
+    vibe: "Bright, herby, and fresh — Vietnamese balance of sweet, sour, and savory in one bowl.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Marinate chicken: fish sauce (or soy), lime, garlic, sugar, pepper. 10 min.","Pan-sear chicken over high heat until caramelized, 6 min. Slice.","Quick-pickle: thin carrot + cucumber in rice vinegar + pinch sugar.","Bowl: rice, chicken, pickled veg, fresh herbs.","Top with crushed peanuts and extra lime."],
+    ingredients: ["2 chicken breasts","1 cup rice","2 limes","3 garlic cloves","1 carrot","1 cucumber","2 tbsp fish sauce or soy sauce","1 tsp sugar","Peanuts, fresh herbs (mint/cilantro)"],
+    tip: "The quick pickle takes 10 minutes and transforms the whole bowl — don't skip it.",
+    leftover: "Keep pickles and chicken separate; assemble fresh.",
+    grocery: { protein:[{name:"Chicken breasts — 2",have:true}], produce:[{name:"Limes — 2",have:false},{name:"Carrot — 1",have:false},{name:"Cucumber — 1",have:false},{name:"Garlic — 3 cloves",have:false},{name:"Fresh herbs",have:false}], grains:[{name:"Rice — 1 cup",have:true}], pantry:[{name:"Fish/soy sauce, sugar, rice vinegar, peanuts",have:false}], dairy:[], canned:[] }
+  },
+  {
+    name: "Spanish Chicken & Chorizo Rice (Arroz)",
+    cuisine: "Spanish", time: 35, energy: ["moderate","energized"],
+    dietary: ["none","dairy-free","gluten-free","high-protein"],
+    key: ["chicken","rice","tomato","bell pepper","onion","garlic","peas","pork"],
+    nutrition: { cal:580, protein:"36g", carbs:"60g", fat:"18g", sugar:"6g", fiber:"4g" },
+    vibe: "One-pan Spanish comfort — smoky paprika, saffron warmth, everything cooked together.",
+    servings: "2 servings",
+    steps: ["Brown chicken pieces in olive oil. Set aside.","Sauté onion, bell pepper, garlic 4 min.","Add rice, smoked paprika, pinch of saffron or turmeric. Stir 1 min.","Add tomatoes and 2 cups broth. Nestle chicken back in.","Cover and simmer 18–20 min until rice absorbs liquid.","Stir in peas last 3 min."],
+    ingredients: ["2 chicken thighs or breasts","1 cup rice","2 tomatoes or 1 can","1 bell pepper","1 onion","3 garlic cloves","½ cup peas","1 tsp smoked paprika","Pinch saffron or turmeric","2 cups broth, olive oil"],
+    tip: "Don't stir once the broth is in — let the rice form a slightly crispy bottom (socarrat). That's the prize.",
+    leftover: "Reheats well with a splash of broth.",
+    grocery: { protein:[{name:"Chicken thighs/breasts — 2",have:true}], produce:[{name:"Tomatoes — 2",have:false},{name:"Bell pepper — 1",have:false},{name:"Onion — 1",have:false},{name:"Garlic — 3 cloves",have:false}], grains:[{name:"Rice — 1 cup",have:true}], pantry:[{name:"Smoked paprika, saffron/turmeric, broth, olive oil",have:false}], dairy:[], canned:[{name:"Peas — ½ cup",have:false}] }
+  },
+  {
+    name: "Beef & Vegetable Stew",
+    cuisine: "American", time: 60, energy: ["energized"],
+    dietary: ["none","dairy-free","gluten-free","high-protein"],
+    key: ["beef","carrot","potato","onion","garlic","celery","tomato","peas"],
+    nutrition: { cal:480, protein:"34g", carbs:"42g", fat:"18g", sugar:"8g", fiber:"7g" },
+    vibe: "The ultimate slow-Sunday comfort — fork-tender beef and vegetables in rich broth.",
+    servings: "4 servings",
+    steps: ["Brown cubed beef in batches in olive oil. Set aside.","Sauté onion, carrot, celery 5 min.","Add garlic, tomato paste, cook 1 min.","Return beef, add broth, potatoes, bay leaf, thyme.","Simmer covered 45 min until beef is tender.","Add peas last 5 min. Season well."],
+    ingredients: ["1 lb beef stew meat, cubed","3 carrots","2 potatoes","1 onion","3 garlic cloves","2 celery stalks","2 tbsp tomato paste","½ cup peas","4 cups broth","Bay leaf, thyme, olive oil, salt"],
+    tip: "Brown the beef hard before stewing — those caramelized bits are the foundation of the whole flavor.",
+    leftover: "Stew is always better day two. Make a big pot.",
+    grocery: { protein:[{name:"Beef stew meat — 1 lb",have:false}], produce:[{name:"Carrots — 3",have:false},{name:"Potatoes — 2",have:false},{name:"Onion — 1",have:false},{name:"Celery — 2 stalks",have:false},{name:"Garlic — 3 cloves",have:false}], grains:[], pantry:[{name:"Tomato paste, broth, bay leaf, thyme, olive oil",have:false}], dairy:[], canned:[{name:"Peas — ½ cup",have:false}] }
+  },
+  {
+    name: "Sweet & Sour Pork Bowl",
+    cuisine: "Chinese", time: 25, energy: ["moderate"],
+    dietary: ["none","dairy-free","high-protein"],
+    key: ["pork","pineapple","bell pepper","rice","onion","garlic","vinegar"],
+    nutrition: { cal:550, protein:"32g", carbs:"62g", fat:"18g", sugar:"22g", fiber:"3g" },
+    vibe: "Takeout favorite at home — tangy, sweet, and far better than delivery.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Cube pork, toss in cornstarch, pan-fry until golden. Set aside.","Sauce: 3 tbsp ketchup, 2 tbsp vinegar, 2 tbsp sugar, 1 tbsp soy sauce, splash water.","Sauté bell pepper, onion 3 min. Add pineapple chunks.","Return pork, pour sauce, toss until glossy.","Serve over rice."],
+    ingredients: ["¾ lb pork, cubed","1 cup rice","1 cup pineapple chunks","1 bell pepper","½ onion","2 garlic cloves","3 tbsp ketchup","2 tbsp vinegar","2 tbsp sugar","1 tbsp soy sauce","Cornstarch, oil"],
+    tip: "Canned pineapple works great — use a little of the juice in the sauce too.",
+    leftover: "Reheat in a pan to keep the pork from going soft.",
+    grocery: { protein:[{name:"Pork — ¾ lb",have:false}], produce:[{name:"Bell pepper — 1",have:false},{name:"Onion — ½",have:false},{name:"Garlic — 2 cloves",have:false}], grains:[{name:"Rice — 1 cup",have:false}], pantry:[{name:"Ketchup, vinegar, sugar, soy sauce, cornstarch, oil",have:false}], dairy:[], canned:[{name:"Pineapple chunks — 1 cup",have:false}] }
+  },
+  {
+    name: "Tuna Pasta Salad",
+    cuisine: "American", time: 15, energy: ["exhausted"],
+    dietary: ["none","pescetarian","high-protein"],
+    key: ["tuna","pasta","cucumber","tomato","onion","corn","peas","yogurt","lemon"],
+    nutrition: { cal:420, protein:"28g", carbs:"52g", fat:"11g", sugar:"6g", fiber:"4g" },
+    vibe: "No-stress pantry dinner — protein-packed, fresh, and ready in 15 minutes.",
+    servings: "2 servings",
+    steps: ["Boil pasta, drain, rinse cold.","Drain canned tuna, flake into a bowl.","Add diced cucumber, tomato, corn, onion.","Dressing: yogurt or mayo + lemon + mustard + salt + pepper.","Toss everything together.","Chill 5 min if you have time, or eat right away."],
+    ingredients: ["2 cans tuna","6 oz pasta","1 cucumber","1 tomato","½ cup corn","¼ onion","3 tbsp yogurt or mayo","1 lemon","1 tsp mustard","Salt, pepper"],
+    tip: "Rinse the pasta cold to stop it cooking and keep the salad fresh and firm.",
+    leftover: "Keeps 2 days in the fridge — great packed lunch.",
+    grocery: { protein:[], produce:[{name:"Cucumber — 1",have:false},{name:"Tomato — 1",have:false},{name:"Onion — ¼",have:false},{name:"Lemon — 1",have:false}], grains:[{name:"Pasta — 6 oz",have:false}], pantry:[{name:"Mustard, salt, pepper, mayo (optional)",have:false}], dairy:[{name:"Yogurt — 3 tbsp (optional)",have:false}], canned:[{name:"Tuna — 2 cans",have:false},{name:"Corn — ½ cup",have:false}] }
+  },
+  {
+    name: "Baja Fish Taco Bowl",
+    cuisine: "Mexican", time: 25, energy: ["moderate"],
+    dietary: ["none","pescetarian","gluten-free","high-protein"],
+    key: ["white fish","tilapia","cod","rice","cabbage","lime","avocado","corn","onion"],
+    nutrition: { cal:470, protein:"34g", carbs:"50g", fat:"14g", sugar:"6g", fiber:"7g" },
+    vibe: "Beachside taco vibes in a bowl — crispy fish, cool slaw, bright lime.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Season fish with cumin, chili powder, paprika, salt.","Pan-fry fish 3–4 min per side until flaky.","Make slaw: shredded cabbage + lime + pinch salt + cilantro.","Crema: yogurt or sour cream + lime + garlic.","Bowl: rice, flaked fish, slaw, corn, avocado, crema drizzled over."],
+    ingredients: ["2 tilapia or cod fillets","1 cup rice","2 cups shredded cabbage","1 avocado","½ cup corn","2 limes","¼ onion","Cumin, chili powder, paprika","Yogurt or sour cream","Cilantro, salt"],
+    tip: "The cabbage slaw is essential — the crunch and acidity cut through the rich fish.",
+    leftover: "Keep components separate. Fish reheats best in a pan.",
+    grocery: { protein:[{name:"Tilapia or cod — 2 fillets",have:false}], produce:[{name:"Cabbage — 2 cups shredded",have:false},{name:"Avocado — 1",have:false},{name:"Limes — 2",have:false},{name:"Onion — ¼",have:false},{name:"Cilantro",have:false}], grains:[{name:"Rice — 1 cup",have:false}], pantry:[{name:"Cumin, chili powder, paprika, salt",have:false}], dairy:[{name:"Yogurt or sour cream",have:false}], canned:[{name:"Corn — ½ cup",have:false}] }
+  },
+  {
+    name: "Coconut Curry Shrimp",
+    cuisine: "Thai", time: 25, energy: ["moderate"],
+    dietary: ["none","dairy-free","gluten-free","pescetarian","high-protein"],
+    key: ["shrimp","coconut milk","rice","bell pepper","onion","garlic","ginger","spinach","lime"],
+    nutrition: { cal:510, protein:"30g", carbs:"50g", fat:"20g", sugar:"6g", fiber:"4g" },
+    vibe: "Fragrant, creamy, and warming — a Thai curry that comes together in one pot.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Sauté onion, garlic, ginger in oil 3 min.","Add curry paste (red or yellow), cook 1 min.","Add coconut milk and bell pepper. Simmer 5 min.","Add shrimp, cook 3 min until pink.","Stir in spinach and lime. Serve over rice."],
+    ingredients: ["¾ lb shrimp","1 cup rice","1 can coconut milk","1 bell pepper","½ onion","3 garlic cloves","1 tsp ginger","2 tbsp curry paste","2 cups spinach","1 lime","Oil, salt"],
+    tip: "Add the shrimp last — they only need 3 minutes and turn rubbery if they sit in the simmering curry.",
+    leftover: "The curry deepens overnight — reheat gently so the shrimp don't toughen.",
+    grocery: { protein:[{name:"Shrimp — ¾ lb",have:false}], produce:[{name:"Bell pepper — 1",have:false},{name:"Onion — ½",have:false},{name:"Garlic — 3 cloves",have:false},{name:"Spinach — 2 cups",have:false},{name:"Lime — 1",have:false},{name:"Ginger",have:false}], grains:[{name:"Rice — 1 cup",have:false}], pantry:[{name:"Curry paste, oil, salt",have:false}], dairy:[], canned:[{name:"Coconut milk — 1 can",have:false}] }
+  },
+  {
+    name: "Caprese Avocado Toast",
+    cuisine: "Italian-American", time: 10, energy: ["exhausted"],
+    dietary: ["vegetarian","high-protein"],
+    key: ["bread","avocado","tomato","cheese","mozzarella","basil","eggs"],
+    nutrition: { cal:380, protein:"15g", carbs:"34g", fat:"22g", sugar:"4g", fiber:"8g" },
+    vibe: "Fancy-feeling, five-minute dinner — fresh mozzarella, ripe tomato, creamy avocado.",
+    servings: "1 serving",
+    steps: ["Toast bread until golden and crisp.","Mash avocado with salt, pepper, lemon. Spread on toast.","Layer sliced tomato and fresh mozzarella.","Top with fresh basil, drizzle olive oil, pinch of salt.","Optional: add a fried or poached egg for extra protein."],
+    ingredients: ["2 slices good bread","1 avocado","1 tomato, sliced","2 oz fresh mozzarella","Fresh basil","1 egg (optional)","Olive oil, lemon, salt, pepper"],
+    tip: "A drizzle of balsamic glaze takes this from good to restaurant-level if you have it.",
+    leftover: "Make it fresh — toast doesn't wait.",
+    grocery: { protein:[], produce:[{name:"Avocado — 1",have:false},{name:"Tomato — 1",have:false},{name:"Fresh basil",have:false}], grains:[{name:"Good bread — 2 slices",have:false}], pantry:[{name:"Olive oil, lemon, salt, pepper",have:false}], dairy:[{name:"Fresh mozzarella — 2 oz",have:false}], canned:[] }
+  },
+  {
+    name: "Loaded Baked Sweet Potato",
+    cuisine: "American", time: 50, energy: ["moderate","energized"],
+    dietary: ["vegetarian","gluten-free","high-protein"],
+    key: ["sweet potato","beans","cheese","yogurt","avocado","corn","spinach","bell pepper"],
+    nutrition: { cal:420, protein:"16g", carbs:"68g", fat:"11g", sugar:"14g", fiber:"14g" },
+    vibe: "Cozy, customizable comfort — a humble sweet potato turned into a full satisfying meal.",
+    servings: "2 servings",
+    steps: ["Preheat oven to 425°F. Pierce sweet potatoes, bake 45 min until tender.","Warm black beans with cumin and garlic powder.","Split potatoes open, fluff insides.","Load with beans, cheese, corn.","Top with yogurt (or sour cream), avocado, and spinach.","Squeeze lime, season, dig in."],
+    ingredients: ["2 large sweet potatoes","1 can black beans","½ cup shredded cheese","½ cup corn","1 avocado","Greek yogurt or sour cream","Cumin, garlic powder, lime, salt"],
+    tip: "Microwave the sweet potatoes 5 min first if you're short on time, then crisp in the oven 15 min.",
+    leftover: "Bake extra sweet potatoes — they reheat into a fast meal all week.",
+    grocery: { protein:[], produce:[{name:"Sweet potatoes — 2 large",have:false},{name:"Avocado — 1",have:false},{name:"Lime — 1",have:false}], grains:[], pantry:[{name:"Cumin, garlic powder, salt",have:false}], dairy:[{name:"Shredded cheese — ½ cup",have:false},{name:"Greek yogurt or sour cream",have:false}], canned:[{name:"Black beans — 1 can",have:false},{name:"Corn — ½ cup",have:false}] }
+  },
+  {
+    name: "Egg & Veggie Breakfast Burrito Bowl",
+    cuisine: "Mexican-American", time: 15, energy: ["exhausted"],
+    dietary: ["vegetarian","gluten-free","high-protein"],
+    key: ["eggs","beans","rice","avocado","cheese","tomato","bell pepper","onion","spinach"],
+    nutrition: { cal:450, protein:"22g", carbs:"48g", fat:"19g", sugar:"5g", fiber:"10g" },
+    vibe: "Breakfast-for-dinner Tex-Mex style — protein-rich, filling, endlessly adaptable.",
+    servings: "2 servings",
+    steps: ["Warm rice and black beans (season beans with cumin).","Scramble eggs softly in butter or oil.","Sauté any veggies you have — peppers, onion, spinach.","Build bowl: rice, beans, eggs, veggies.","Top with cheese, avocado, salsa, lime."],
+    ingredients: ["4 eggs","1 can black beans","1 cup cooked rice","1 avocado","½ cup shredded cheese","Bell pepper, onion, spinach (any)","Cumin, salt, lime, salsa"],
+    tip: "Pull the eggs off heat while still slightly wet — they finish cooking from residual heat and stay creamy.",
+    leftover: "Eggs are best fresh, but the beans and rice base preps ahead easily.",
+    grocery: { protein:[{name:"Eggs — 4",have:true}], produce:[{name:"Avocado — 1",have:false},{name:"Bell pepper, onion, spinach (any)",have:false},{name:"Lime — 1",have:false}], grains:[{name:"Rice — 1 cup cooked",have:false}], pantry:[{name:"Cumin, salt, salsa",have:false}], dairy:[{name:"Shredded cheese — ½ cup",have:false}], canned:[{name:"Black beans — 1 can",have:false}] }
+  },
+  {
+    name: "Chicken Vegetable Soup",
+    cuisine: "American", time: 40, energy: ["moderate"],
+    dietary: ["none","dairy-free","gluten-free","high-protein"],
+    key: ["chicken","carrot","celery","onion","garlic","spinach","peas","corn","rice","pasta"],
+    nutrition: { cal:340, protein:"32g", carbs:"38g", fat:"7g", sugar:"6g", fiber:"5g" },
+    vibe: "The original soul-soother — clean, comforting, and good for whatever ails you.",
+    servings: "4 servings",
+    steps: ["Sauté onion, carrot, celery in olive oil 5 min.","Add garlic 1 min. Add 6 cups broth.","Add chicken (whole breasts or diced), bring to simmer.","Cook 20 min. Remove chicken, shred, return to pot.","Add rice or pasta, cook until tender.","Stir in spinach and peas last 5 min. Season well."],
+    ingredients: ["2 chicken breasts","3 carrots","2 celery stalks","1 onion","3 garlic cloves","2 cups spinach","½ cup peas","½ cup rice or pasta","6 cups broth","Olive oil, salt, pepper, thyme"],
+    tip: "Cooking the chicken right in the broth gives you the most flavorful soup and saves a step.",
+    leftover: "Soup is medicine that gets better daily — make a big pot for the week.",
+    grocery: { protein:[{name:"Chicken breasts — 2",have:true}], produce:[{name:"Carrots — 3",have:false},{name:"Celery — 2 stalks",have:false},{name:"Onion — 1",have:false},{name:"Garlic — 3 cloves",have:false},{name:"Spinach — 2 cups",have:false}], grains:[{name:"Rice or pasta — ½ cup",have:false}], pantry:[{name:"Broth, olive oil, thyme, salt, pepper",have:false}], dairy:[], canned:[{name:"Peas — ½ cup",have:false}] }
+  },
+  {
+    name: "Chana Masala (Chickpea Curry)",
+    cuisine: "Indian", time: 30, energy: ["moderate"],
+    dietary: ["vegetarian","vegan","gluten-free","dairy-free","high-protein"],
+    key: ["chickpeas","tomato","onion","garlic","ginger","rice","spinach"],
+    nutrition: { cal:430, protein:"16g", carbs:"74g", fat:"9g", sugar:"9g", fiber:"15g" },
+    vibe: "Hearty, warmly spiced, and entirely plant-based — Indian street food comfort at home.",
+    servings: "2 servings",
+    steps: ["Cook rice.","Sauté onion in oil 5 min until soft. Add garlic, ginger.","Add cumin, coriander, garam masala, turmeric, chili powder. Cook 1 min.","Add tomatoes, simmer 5 min into a thick sauce.","Add chickpeas + ½ cup water. Simmer 10 min.","Stir in spinach, season, finish with lemon. Serve over rice."],
+    ingredients: ["2 cans chickpeas","1 cup rice","1 can diced tomatoes or 3 fresh","1 onion","4 garlic cloves","1 tsp ginger","1 tsp cumin, coriander, garam masala","½ tsp turmeric, chili powder","2 cups spinach","1 lemon, oil, salt"],
+    tip: "Mash a handful of the chickpeas into the sauce — it thickens everything and makes it luxurious.",
+    leftover: "Even better the next day. Freezes beautifully too.",
+    grocery: { protein:[], produce:[{name:"Onion — 1",have:false},{name:"Garlic — 4 cloves",have:false},{name:"Ginger",have:false},{name:"Spinach — 2 cups",have:false},{name:"Lemon — 1",have:false}], grains:[{name:"Rice — 1 cup",have:false}], pantry:[{name:"Cumin, coriander, garam masala, turmeric, chili powder, oil, salt",have:false}], dairy:[], canned:[{name:"Chickpeas — 2 cans",have:false},{name:"Diced tomatoes — 1 can",have:false}] }
+  }
+];
+
+
+// ── Matching logic ──────────────────────────────────────────
+function parseIngredients(raw) {
+  return raw.toLowerCase().split(/[,\n]+/).map(function(s){ return s.trim(); }).filter(Boolean);
+}
+
+function scoreRecipe(recipe, userIngredients) {
+  var score = 0;
+  var normalizedUser = userIngredients.map(normalizeIngredient);
+  recipe.key.forEach(function(k) {
+    var kNorm = normalizeIngredient(k);
+    var kWords = kNorm.split(' ');
+    normalizedUser.forEach(function(u) {
+      var uWords = u.split(' ');
+      var matched = kWords.some(function(kw) {
+        return uWords.some(function(uw) {
+          return uw.length >= 3 && kw.length >= 3 && (kw === uw || kw.startsWith(uw) || uw.startsWith(kw));
+        });
+      });
+      if (matched) score++;
+    });
+  });
+  return score;
+}
+
+function topMatch(recipe, userIngredients) {
+  var normalizedUser = userIngredients.map(normalizeIngredient);
+  var primaryNorm = normalizeIngredient(recipe.key[0]);
+  var primary = primaryNorm.split(' ');
+  return normalizedUser.some(function(u) {
+    var uWords = u.split(' ');
+    return primary.some(function(pw) {
+      return uWords.some(function(uw) {
+        return uw.length >= 3 && pw.length >= 3 && (pw === uw || pw.startsWith(uw) || uw.startsWith(pw));
+      });
+    });
+  });
+}
+
+function matchesDiet(recipe, diet) {
+  if (!diet || diet === 'none') return true;
+  return recipe.dietary.includes(diet);
+}
+
+function matchesTime(recipe, time) {
+  if (!time) return true;
+  return recipe.time <= parseInt(time);
+}
+
+// ── Generate ────────────────────────────────────────────────
+function renderNoMatch(userIngredients) {
+  var html = '<div class="no-match">' +
+    '<p style="font-size:24px;margin-bottom:12px;">🥗</p>' +
+    '<p style="font-weight:500;color:var(--navy);margin-bottom:8px;">We couldn\'t find a match for those ingredients.</p>' +
+    '<p>We don\'t have a recipe built around <strong>' + userIngredients.join(', ') + '</strong> yet.</p>' +
+    '<p style="margin-top:10px;">Try adding more common ingredients like <em>chicken, rice, eggs, spinach, garlic, or bell pepper</em> — or mix in a protein and we\'ll find something for you.</p>' +
+    '<button class="generate-btn" style="margin-top:1.5rem;max-width:280px;" onclick="document.getElementById(\'ingredients\').value=\'\';document.getElementById(\'ingredients\').focus();document.getElementById(\'result\').classList.remove(\'show\')">Try different ingredients</button>' +
+    '</div>';
+  document.getElementById('result-inner').innerHTML = html;
+  document.getElementById('result').classList.add('show');
+  document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function generate() {
+  var raw = document.getElementById('ingredients').value.trim();
+  if (!raw) { document.getElementById('ingredients').focus(); return; }
+
+  var userIngredients = parseIngredients(raw);
+  var time = getVal('time-group');
+  var diet = getVal('diet-group');
+
+  // Filter by diet and time
+  var candidates = RECIPES.filter(function(r){
+    return matchesDiet(r, diet) && matchesTime(r, time);
+  });
+
+  // If no diet/time match, open up the pool
+  if (!candidates.length) candidates = RECIPES.slice();
+
+  // Score by how many key ingredients the user actually has
+  var scored = candidates.map(function(r){
+    return { recipe: r, score: scoreRecipe(r, userIngredients) };
+  });
+
+  // Require at least 2 matching ingredients, OR 1 match on the primary ingredient
+  var strongMatches = scored.filter(function(s){ return s.score >= 2; });
+  var weakMatches   = scored.filter(function(s){ return s.score >= 1 && topMatch(s.recipe, userIngredients); });
+  var matches = strongMatches.length ? strongMatches : weakMatches;
+
+  if (!matches.length) {
+    renderNoMatch(userIngredients);
+    return;
+  }
+
+  matches.sort(function(a, b){ return b.score - a.score; });
+  renderResult(matches[0].recipe);
+}
+
+// ── Render ──────────────────────────────────────────────────
+function renderResult(meal) {
+  var sections = ['protein','produce','dairy','grains','pantry','canned'];
+  var sectionNames = {
+    protein:'Protein', produce:'Produce', dairy:'Dairy',
+    grains:'Grains & Rice', pantry:'Pantry & Spices', canned:'Canned & Frozen'
+  };
+
+  var groceryHTML = '';
+  var needIds = [];
+  var idCounter = 0;
+
+  sections.forEach(function(sec){
+    var items = meal.grocery[sec];
+    if (!items || !items.length) return;
+    groceryHTML += '<div class="grocery-section"><p class="grocery-section-name">' + sectionNames[sec] + '</p>';
+    items.forEach(function(item){
+      var id = 'gi_' + idCounter++;
+      if (!item.have) needIds.push(id);
+      groceryHTML += '<div class="grocery-item">' +
+        '<input type="checkbox" id="' + id + '" onchange="updateList(this)">' +
+        '<label for="' + id + '">' + item.name + '</label>' +
+        (item.have ? '<span class="have-badge">You have this</span>' : '') +
+        '</div>';
+    });
+    groceryHTML += '</div>';
+  });
+
+  var html = '<div class="result-header">' +
+    '<p class="result-eyebrow">Tonight\'s meal</p>' +
+    '<h2 class="result-title">' + meal.name + '</h2>' +
+    '<p class="result-vibe">' + meal.vibe + '</p>' +
+    '</div>' +
+    '<div class="chips">' +
+      '<span class="chip">' + meal.time + ' min</span>' +
+      '<span class="chip">' + meal.servings + '</span>' +
+    '</div>' +
+    '<div class="nutrition-panel">' +
+      '<p class="nutrition-panel-title">Nutrition per serving</p>' +
+      '<div class="nutrition-grid">' +
+        '<div class="nutrition-item"><p class="nutrition-value">' + meal.nutrition.cal + '</p><p class="nutrition-label">Calories</p></div>' +
+        '<div class="nutrition-item"><p class="nutrition-value">' + meal.nutrition.protein + '</p><p class="nutrition-label">Protein</p></div>' +
+        '<div class="nutrition-item"><p class="nutrition-value">' + meal.nutrition.carbs + '</p><p class="nutrition-label">Carbs</p></div>' +
+      '</div>' +
+      '<hr class="nutrition-rule">' +
+      '<div class="nutrition-grid">' +
+        '<div class="nutrition-item"><p class="nutrition-value">' + meal.nutrition.fat + '</p><p class="nutrition-label">Total Fat</p></div>' +
+        '<div class="nutrition-item"><p class="nutrition-value">' + meal.nutrition.sugar + '</p><p class="nutrition-label">Sugar</p></div>' +
+        '<div class="nutrition-item"><p class="nutrition-value">' + meal.nutrition.fiber + '</p><p class="nutrition-label">Fiber</p></div>' +
+      '</div>' +
+      '<p class="nutrition-note">Estimates based on standard serving sizes. Actual values may vary.</p>' +
+    '</div>' +
+    '<hr class="divider">' +
+    '<span class="section-label">What you\'ll use</span>' +
+    '<ul class="ingredients-list">' + meal.ingredients.map(function(i){ return '<li>' + i + '</li>'; }).join('') + '</ul>' +
+    '<hr class="divider">' +
+    '<span class="section-label">How to make it</span>' +
+    '<ol class="steps-list">' + meal.steps.map(function(s){ return '<li>' + s + '</li>'; }).join('') + '</ol>' +
+    '<hr class="divider">' +
+    '<div class="info-box"><span class="section-label">Pro tip</span><p>' + meal.tip + '</p></div>' +
+    '<div class="info-box"><span class="section-label">Leftover idea</span><p>' + meal.leftover + '</p></div>' +
+    '<div class="grocery-card">' +
+      '<div class="grocery-top">' +
+        '<div><p class="grocery-top-title">Grocery List</p><p class="grocery-top-sub">Organized by store section</p></div>' +
+        '<span class="grocery-hint">Tap to check off</span>' +
+      '</div>' +
+      '<div class="grocery-body">' + groceryHTML + '</div>' +
+      '<div class="grocery-footer">' +
+        '<p class="progress-label" id="progress">0 of ' + needIds.length + ' items checked</p>' +
+        '<button class="clear-btn" onclick="clearList()">Clear all</button>' +
+      '</div>' +
+      '<div class="download-row" style="padding:0 1.5rem 1rem;background:#fff;">' +
+        '<button class="dl-btn dl-btn-pdf" onclick="downloadPDF()">' +
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
+          ' Save as PDF' +
+        '</button>' +
+        '<button class="dl-btn dl-btn-copy" onclick="copyList()">' +
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
+          ' Copy to clipboard' +
+        '</button>' +
+      '</div>' +
+      '<p class="copy-confirm" id="copy-confirm" style="padding:0 1.5rem 0.75rem;background:#fff;"></p>' +
+    '</div>' +
+    '<div class="actions">' +
+      '<button class="action-btn" onclick="document.getElementById(\'ingredients\').value=\'\'; document.getElementById(\'result\').classList.remove(\'show\'); document.getElementById(\'ingredients\').focus();">New ingredients</button>' +
+      '<button class="action-btn primary" onclick="generate()">Try another meal →</button>' +
+    '</div>';
+
+  window._needIds = needIds;
+  document.getElementById('result-inner').innerHTML = html;
+  var resultEl = document.getElementById('result');
+  resultEl.classList.add('show');
+  resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  updateProgress();
+}
+
+function updateList(cb) {
+  var lbl = document.querySelector('label[for="' + cb.id + '"]');
+  if (lbl) { cb.checked ? lbl.classList.add('done') : lbl.classList.remove('done'); }
+  updateProgress();
+}
+
+function updateProgress() {
+  var ids = window._needIds || [];
+  var checked = ids.filter(function(id){ var el=document.getElementById(id); return el&&el.checked; }).length;
+  var el = document.getElementById('progress');
+  if (el) el.textContent = checked + ' of ' + ids.length + ' items checked';
+}
+
+function clearList() {
+  document.querySelectorAll('.grocery-item input').forEach(function(cb){
+    cb.checked = false;
+    var lbl = document.querySelector('label[for="' + cb.id + '"]');
+    if (lbl) lbl.classList.remove('done');
+  });
+  updateProgress();
+}
+</script>
+</body>
+</html>
+<script>
+function downloadPDF() { window.print(); }
+
+function copyList() {
+  var sections = document.querySelectorAll('.grocery-section');
+  if (!sections.length) return;
+  var text = '🛒 GROCERY LIST — The Thriving Woman Reset\n';
+  text += 'thethrivingwomanreset.com/meal-generator\n';
+  text += '─────────────────────────────────────────\n';
+  sections.forEach(function(sec) {
+    var title = sec.querySelector('.grocery-section-name');
+    if (title) text += '\n' + title.textContent.toUpperCase() + '\n';
+    sec.querySelectorAll('.grocery-item').forEach(function(item) {
+      var lbl = item.querySelector('label');
+      var badge = item.querySelector('.have-badge');
+      if (lbl) text += (badge ? '  ✓ ' : '  ☐ ') + lbl.textContent.trim() + (badge ? ' (have this)' : '') + '\n';
+    });
+  });
+  text += '\n─────────────────────────────────────────\n';
+  text += 'Generated by TWR Fridge-to-Meal Generator\n';
+
+  function showConfirm(msg) {
+    var el = document.getElementById('copy-confirm');
+    if (el) { el.textContent = msg; el.style.opacity = '1'; setTimeout(function(){ el.style.opacity = '0'; }, 4000); }
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function() {
+      showConfirm('✓ Grocery list copied! Paste it in Notes, Instacart, or iMessage.');
+    }).catch(function() { fallback(text, showConfirm); });
+  } else { fallback(text, showConfirm); }
+}
+
+function fallback(text, cb) {
+  var ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); cb('✓ Copied! Paste it anywhere you shop.'); }
+  catch(e) { cb('Select the list manually to copy.'); }
+  document.body.removeChild(ta);
+}
+</script>

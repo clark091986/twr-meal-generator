@@ -988,13 +988,33 @@ function parseIngredients(raw) {
 
 function scoreRecipe(recipe, userIngredients) {
   var score = 0;
-  recipe.key.forEach(function(k){
-    var kl = k.toLowerCase();
-    userIngredients.forEach(function(u){
-      if (kl.includes(u) || u.includes(kl.split(' ')[0])) score++;
+  recipe.key.forEach(function(k) {
+    var kWords = k.toLowerCase().split(' ');
+    userIngredients.forEach(function(u) {
+      var uWords = u.toLowerCase().split(' ');
+      // Match only when a meaningful word (3+ chars) aligns between key and user input
+      var matched = kWords.some(function(kw) {
+        return uWords.some(function(uw) {
+          return uw.length >= 3 && kw.length >= 3 && (kw === uw || kw.startsWith(uw) || uw.startsWith(kw));
+        });
+      });
+      if (matched) score++;
     });
   });
   return score;
+}
+
+function topMatch(recipe, userIngredients) {
+  // The recipe's first key ingredient (primary protein/base) must appear in user's list
+  var primary = recipe.key[0].toLowerCase().split(' ');
+  return userIngredients.some(function(u) {
+    var uWords = u.toLowerCase().split(' ');
+    return primary.some(function(pw) {
+      return uWords.some(function(uw) {
+        return uw.length >= 3 && pw.length >= 3 && (pw === uw || pw.startsWith(uw) || uw.startsWith(pw));
+      });
+    });
+  });
 }
 
 function matchesDiet(recipe, diet) {
@@ -1008,26 +1028,52 @@ function matchesTime(recipe, time) {
 }
 
 // ── Generate ────────────────────────────────────────────────
+function renderNoMatch(userIngredients) {
+  var html = '<div class="no-match">' +
+    '<p style="font-size:24px;margin-bottom:12px;">🥗</p>' +
+    '<p style="font-weight:500;color:var(--navy);margin-bottom:8px;">We couldn\'t find a match for those ingredients.</p>' +
+    '<p>We don\'t have a recipe built around <strong>' + userIngredients.join(', ') + '</strong> yet.</p>' +
+    '<p style="margin-top:10px;">Try adding more common ingredients like <em>chicken, rice, eggs, spinach, garlic, or bell pepper</em> — or mix in a protein and we\'ll find something for you.</p>' +
+    '<button class="generate-btn" style="margin-top:1.5rem;max-width:280px;" onclick="document.getElementById(\'ingredients\').value=\'\';document.getElementById(\'ingredients\').focus();document.getElementById(\'result\').classList.remove(\'show\')">Try different ingredients</button>' +
+    '</div>';
+  document.getElementById('result-inner').innerHTML = html;
+  document.getElementById('result').classList.add('show');
+  document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 function generate() {
   var raw = document.getElementById('ingredients').value.trim();
   if (!raw) { document.getElementById('ingredients').focus(); return; }
 
   var userIngredients = parseIngredients(raw);
-  var time   = getVal('time-group');
-  var diet   = getVal('diet-group');
+  var time = getVal('time-group');
+  var diet = getVal('diet-group');
 
+  // Filter by diet and time
   var candidates = RECIPES.filter(function(r){
     return matchesDiet(r, diet) && matchesTime(r, time);
   });
 
+  // If no diet/time match, open up the pool
   if (!candidates.length) candidates = RECIPES.slice();
 
-  candidates.sort(function(a, b){
-    return scoreRecipe(b, userIngredients) - scoreRecipe(a, userIngredients);
+  // Score by how many key ingredients the user actually has
+  var scored = candidates.map(function(r){
+    return { recipe: r, score: scoreRecipe(r, userIngredients) };
   });
 
-  var meal = candidates[0];
-  renderResult(meal);
+  // Require at least 2 matching ingredients, OR 1 match on the primary ingredient
+  var strongMatches = scored.filter(function(s){ return s.score >= 2; });
+  var weakMatches   = scored.filter(function(s){ return s.score >= 1 && topMatch(s.recipe, userIngredients); });
+  var matches = strongMatches.length ? strongMatches : weakMatches;
+
+  if (!matches.length) {
+    renderNoMatch(userIngredients);
+    return;
+  }
+
+  matches.sort(function(a, b){ return b.score - a.score; });
+  renderResult(matches[0].recipe);
 }
 
 // ── Render ──────────────────────────────────────────────────
